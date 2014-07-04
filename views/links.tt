@@ -1,0 +1,22 @@
+[% FOREACH link IN links %]
+<li>
+	[% SET l = link.link_info %]
+	[% IF l.url %]
+		<a href="[% l.url %]">[% l.text %]</a>
+	[% ELSE %]
+		[% IF l.document %]
+			<a href="#"
+				onClick="
+				display_document('module:[% l.document %]');
+				return true;
+				">
+				[% l.text %]
+			</a>
+		[% ELSE %]
+			<a href="#[% l.section %]">
+				[% l.text %]
+			</a>
+		[% END %]
+	[% END %]
+</li>
+[% END %]

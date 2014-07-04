@@ -1,0 +1,130 @@
+[% INCLUDE pod_tt pod=pod %]
+
+[% BLOCK pod_tt %]
+  [% FOREACH node IN pod.children %]
+	[% SET tt_name = node.type;
+	   tt_name = tt_name.replace(":","X");
+	   tt_name = tt_name.replace("#","_");
+	   SET tt_name = "tt_" _ tt_name; %]
+	
+	[% INCLUDE $tt_name p_node=node %]
+	
+  [% END %]
+[% END %]
+
+[% BLOCK tt__cut %]
+
+[% END %]
+
+[% BLOCK tt_head1 %]
+  <h2><a name="[% p_node.param('heading').text %]">[% INCLUDE pod_tt pod=p_node.param('heading') %]</a></h2>
+  [% INCLUDE pod_tt pod=p_node %]
+[% END %]
+
+[% BLOCK tt_head2 %]
+  <h3><a name="[% p_node.param('heading').text %]">[% INCLUDE pod_tt pod=p_node.param('heading') %]</a></h3>
+  [% INCLUDE pod_tt pod=p_node %]
+[% END %]
+
+[% BLOCK tt_head3 %]
+  <h4><a name="[% p_node.param('heading').text %]">[% INCLUDE pod_tt pod=p_node.param('heading') %]</a></h4>
+  [% INCLUDE pod_tt pod=p_node %]
+[% END %]
+
+[% BLOCK tt_head4 %]
+  <h5><a name="[% p_node.param('heading').text %]">[% INCLUDE pod_tt pod=p_node.param('heading') %]</a></h5>
+  [% INCLUDE pod_tt pod=p_node %]
+[% END %]
+
+[% BLOCK tt_XB %]
+<span class="strong">[% INCLUDE pod_tt pod=p_node %]</span>
+[% END %]
+
+[% BLOCK tt_XC %]
+<code>[% INCLUDE pod_tt pod=p_node %]</code>
+[% END %]
+
+[% BLOCK tt_XF %]
+<span class="fixed">[% INCLUDE pod_tt pod=p_node %]</span>
+[% END %]
+
+[% BLOCK tt_XI %]
+<span class="emph">[% INCLUDE pod_tt pod=p_node %]</span>
+[% END %]
+
+[% BLOCK tt_XE %]
+[% p_node.text | html %]
+[% END %]
+
+[% BLOCK tt_XS %]
+<span class="no_break">[% INCLUDE pod_tt pod=p_node %]</span>
+[% END %]
+
+[% BLOCK tt_XL %]
+<span class="link">
+	[% SET l = p_node.link_info %]
+	[% IF l.url %]
+		<a href="[% l.url %]">[% l.text %]</a>
+	[% ELSE %]
+		[% IF l.document %]
+			<a href="#"
+				onClick="
+				display_document('[% l.document %]');
+				return true;
+				">
+				[% l.text %]
+			</a>
+		[% ELSE %]
+			<a href="#[% l.section %]">
+				[% l.text %]
+			</a>
+		[% END %]
+	[% END %]
+</span>
+[% END %]
+
+[% BLOCK tt_pod %]
+[% INCLUDE pod_tt pod=p_node %]
+[% END %]
+
+[% BLOCK tt_over %]
+	[% IF p_node.select('/item[@label =~ {^ *\* *$}]').list.size %]
+	<ul>[% INCLUDE pod_tt pod=p_node %]</ul>
+	[% ELSIF p_node.select('/item[@label =~ {^[0-9]+\.?$}]').list.size %]
+	<ol>[% INCLUDE pod_tt pod=p_node %]</ol>
+	[% ELSE %]
+	<dl>[% INCLUDE pod_tt pod=p_node %]</dl>
+	[% END %]
+[% END %]
+
+[% BLOCK tt_item %]
+[% IF p_node.param('label').pod.match('^ *\* *$') %]
+  <li>[% INCLUDE pod_tt pod=p_node %]</li>
+[% ELSIF p_node.param('label').pod.match('^[0-9]+\.?$') %]
+  <li>[% INCLUDE pod_tt pod=p_node %]</li>
+[% ELSE %]
+  <dt>[% INCLUDE pod_tt pod=p_node.param('label') %]</dt>
+  <dd>[% INCLUDE pod_tt pod=p_node %]</dd>
+[% END %]
+[% END %]
+
+[% BLOCK tt_Xparagraph %]
+<p>[% INCLUDE pod_tt pod=p_node %]</p>
+[% END %]
+
+[% BLOCK tt_Xverbatim %]
+<pre>[% p_node.body.replace('[\s\n]+$','') | html %]</pre>
+[% END %]
+
+[% BLOCK tt_Xtext %]
+[% p_node.text | html %]
+[% END %]
+
+[% BLOCK tt_for %]
+[% END %]
+
+[% BLOCK tt_begin %]
+[% END %]
+
+[% BLOCK tt_encoding %]
+[% END %]

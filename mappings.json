@@ -1,0 +1,49 @@
+{
+      "mappings" : {
+         "function" : {
+            "properties" : {
+               "pod" : {
+                  "type" : "string"
+               },
+               "shortdesc" : {
+                  "type" : "string"
+               },
+               "parent_module" : {
+                  "type" : "string",
+                  "index" : "not_analyzed"
+               },
+               "date" : {
+                  "format" : "dateOptionalTime",
+                  "type" : "date"
+               },
+               "title" : {
+                  "type" : "string"
+               }
+            }
+         },
+         "module" : {
+            "properties" : {
+               "pod" : {
+                  "type" : "string"
+               },
+               "shortdesc" : {
+                  "type" : "string"
+               },
+               "links_to" : {
+                  "type" : "string",
+                  "index" : "not_analyzed"
+               },
+               "date" : {
+                  "format" : "dateOptionalTime",
+                  "type" : "date"
+               },
+               "title" : {
+                  "type" : "string"
+               },
+               "head2" : {
+                  "type" : "string"
+               }
+            }
+         }
+      }
+}

@@ -1,0 +1,3 @@
+<ul class="menu">
+[% INCLUDE menu_traverse.tt pod = pa %]
+</ul>

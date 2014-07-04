@@ -1,0 +1,27 @@
+[% IF results.modules %]
+<div class="fs_section modules" id="fs_modules">
+	<div class="fs_heading">Modules</div>
+	[% FOREACH r IN results.modules %]
+	<div class="result_line" paws_link="module:[% r.title %]">
+		[% r.title | html %]
+		<div class="result_sd">
+			[% r.shortdesc | html %]
+		</div>
+	</div>
+	[% END %]
+</div>
+[% END %]
+
+[% IF results.functions %]
+<div class="fs_section functions" id="fs_functions">
+	<div class="fs_heading">Functions</div>
+	[% FOREACH r IN results.functions %]
+	<div class="result_line" paws_link="function:[% r.parent_module %]::[% r.title %]">
+		[% r.title | html %]
+		<div class="result_sd">
+			[% r.shortdesc | html %]
+		</div>
+	</div>
+	[% END %]
+</div>
+[% END %]

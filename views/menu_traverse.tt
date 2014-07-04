@@ -1,0 +1,53 @@
+[% INCLUDE pod_tt pod=pod %]
+
+[% BLOCK pod_tt %]
+  [% FOREACH node IN pod.children %]
+	[% SET tt_name = node.type;
+	   tt_name = tt_name.replace(":","X");
+	   tt_name = tt_name.replace("#","_");
+	   SET tt_name = "tt_" _ tt_name; %]
+	
+	[% INCLUDE $tt_name p_node=node %]
+	
+  [% END %]
+[% END %]
+
+[% BLOCK tt__cut %]
+
+[% END %]
+
+[% BLOCK tt_head1 %]
+  [% INCLUDE pod_tt pod=p_node %]
+[% END %]
+
+[% BLOCK tt_pod %]
+[% INCLUDE pod_tt pod=p_node %]
+[% END %]
+
+[% BLOCK tt_over %]
+	<ul>[% INCLUDE pod_tt pod=p_node %]</ul>
+[% END %]
+
+[% BLOCK tt_item %]
+  <li><a href="#[% p_node.param('label').text %]">[% INCLUDE pod_tt pod=p_node.param('label') %]</a>
+	  [% INCLUDE pod_tt pod=p_node %]
+	</li>
+[% END %]
+
+[% BLOCK tt_Xparagraph %]
+<p>[% INCLUDE pod_tt pod=p_node %]</p>
+[% END %]
+
+[% BLOCK tt_Xverbatim %]
+<div class="example">
+	<h3>Example:</h3>
+	<pre>[% p_node.body.replace('[\s\n]+$','') | html %]</pre>
+</div>
+[% END %]
+
+[% BLOCK tt_Xtext %]
+[% p_node.text | html %]
+[% END %]
+
+[% BLOCK tt_for %]
+[% END %]

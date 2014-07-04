@@ -60,6 +60,7 @@ window.onload = function(e) {
   var cookie = readCookie("style");
   var title = cookie ? cookie : getPreferredStyleSheet();
   setActiveStyleSheet(title);
+  load_recents();
 }
 
 
@@ -103,9 +104,25 @@ function display_document(name) {
     );
 }
 
+function load_recents() {
+    var params = document.URL.toQueryParams();
+    var d = params.d;
+    var c = params.c;
+    
+    var all = d.split(",");
+    all.each(function(x) { recents.set(x,1); });
+    display_document(c);
+}
+
 function update_recents(name) { // returns the element created for "name" if possible
     var out = null;
     $(recent_searches).childElements().each(function(e) { e.remove() });
+    history.pushState( {
+      old_text: "PAWS",
+      new_text: "PAWS",
+      slug: ("?d=" + recents.keys().sort().join(",") + "&c=" + current_document)
+    }, null, ("?d=" + recents.keys().sort().join(",")) + "&c=" + current_document);
+    
     recents.keys().sort().each( function(k) {
         var pm = /^([a-z]+):(.*)$/;
         var match = pm.exec(k);

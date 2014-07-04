@@ -64,7 +64,7 @@
 <span class="link">
 	[% SET l = p_node.link_info %]
 	[% IF l.url %]
-		<a href="[% l.url %]">[% l.text %]</a>
+		<a target="_blank" href="[% l.url %]">[% l.text %]</a>
 	[% ELSE %]
 		[% IF l.document %]
 			<a href="#"

@@ -99,6 +99,13 @@ function display_document(name) {
                 'inbound_links','/inbound_links',
                 {parameters: {key: name}}
                 );
+            
+        },
+        onComplete: function(response) {
+            /* Trigger highlight.js */
+            $$("pre code").each(function(elt) {
+                hljs.highlightBlock(elt);
+            })
         }
     }
     );

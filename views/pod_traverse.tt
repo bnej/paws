@@ -113,7 +113,7 @@
 [% END %]
 
 [% BLOCK tt_Xverbatim %]
-<pre>[% p_node.body.replace('[\s\n]+$','') | html %]</pre>
+<pre><code>[% p_node.body.replace('[\s\n]+$','') | html %]</code></pre>
 [% END %]
 
 [% BLOCK tt_Xtext %]

@@ -5,7 +5,9 @@
 <title>PAWS</title>
 <link rel="stylesheet" title="Light" href="[% request.uri_base %]/css/style.css" />
 <link rel="alternate stylesheet" title="Dark" href="[% request.uri_base %]/css/style_dark.css" />
-<link rel="stylesheet" href="[% request.uri_base %]/css/foundation.css" /> <!-- highlightjs css -->
+<link rel="stylesheet" href="[% request.uri_base %]/css/foundation.css" /> 
+<link rel="alternate stylesheet" title="Dark" href="[% request.uri_base %]/css/monokai_sublime.css" /> 
+<!-- highlightjs css -->
 
 <script src="[% request.uri_base %]/javascripts/prototype.js" type="text/javascript"></script>
 <script src="[% request.uri_base %]/javascripts/paws.js" type="text/javascript"></script>

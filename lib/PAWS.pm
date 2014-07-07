@@ -23,9 +23,9 @@ return <<EOF;
 
 Error - Couldn't find a document called $term
 
-=head2 DESCRIPTION
+=head1 DESCRIPTION
 
-My not-so-clever search through your C<\@INC> path has failed, I guess that's no good.
+I don't have an indexed document for $term.
 
 EOF
 }
@@ -63,7 +63,7 @@ sub load_pa($) {
         );
     my $doc = $results->{docs}[0];
     
-    if($doc) {
+    if($doc->{found}) {
         return Pod::Abstract->load_string($doc->{_source}{pod});
     } else {
         return Pod::Abstract->load_string(error_doc($term));

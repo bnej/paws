@@ -545,11 +545,11 @@ div.links h3 {
     font-size: 12px;
 }
 
-ul#recent_searches, ul#doc_links {
+ul#recent_searches, ul.doc_links {
     margin: 0; padding: 0;
 }
 
-ul#recent_searches li, ul#doc_links li {
+ul#recent_searches li, ul.doc_links li {
     margin: 2px; padding: 5px;
     background-color: #000;
     border-radius: 3px;
@@ -559,7 +559,18 @@ ul#recent_searches li, ul#doc_links li {
     float: left;
 }
 
-ul#doc_links li {
+ul.doc_links li {
+    max-width: 196px;
+    overflow: hidden;
+}
+
+ul.doc_links li:hover {
+    border: 1px solid white;
+    margin: 1px;
+    max-width: 100%;
+}
+
+ul.doc_links li {
     padding-right: 5px;
 }
 
@@ -611,25 +622,40 @@ code, tt {
     font-style: italic;
 }
 
-div.autocomplete {
+div#paws_fsearch {
   position:absolute;
-  width:400px;
   z-index: 100;
   background-color:black;
   border:1px solid #999;
   margin:0;
   padding:0;
+  box-shadow:         2px 2px 13px 0px rgba(24, 180, 63, 0.75);
 }
-div.autocomplete ul {
-  list-style-type:none;
-  margin:0;
-  padding:0;
+
+div.fs_section {
+    width: 290px;
+    margin: 0 5px 0 5px;
+    float: left;
 }
-div.autocomplete ul li.selected { background-color: #330;}
-div.autocomplete ul li {
-  list-style-type:none;
-  display:block;
-  margin:0;
-  padding:2px;
-  cursor:pointer;
+
+div.fs_heading {
+    font-weight: bold;
+    border-bottom: 1px solid white;
+}
+
+div.result_line {
+    height: 40px;
+    padding: 0 5px 0 5px;
+    margin-bottom: 5px;
+    overflow: hidden;
+}
+
+div.hilight {
+    background-color: #DDD;
+    color: black;
+}
+
+div.result_line div.result_sd {
+    font-size: 0.8em;
+    color: #888;
 }

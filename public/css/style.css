@@ -407,7 +407,7 @@ div.paws_banner p {
     margin: 0;
     padding: 0;
     font-size: 80%;
-    color: #CCC;
+    color: #888;
     padding: 0 0 0 35px;
 }
 
@@ -560,6 +560,17 @@ ul#recent_searches li, ul.doc_links li {
 }
 
 ul.doc_links li {
+    max-width: 196px;
+    overflow: hidden;
+}
+
+ul.doc_links li:hover {
+    border: 1px solid black;
+    margin: 1px;
+    max-width: 100%;
+}
+
+ul.doc_links li {
     padding-right: 5px;
 }
 
@@ -618,6 +629,7 @@ div#paws_fsearch {
   border:1px solid #888;
   margin:0;
   padding:0;
+  box-shadow:         2px 2px 13px 0px rgba(24, 38, 63, 0.75);
 }
 
 div.fs_section {

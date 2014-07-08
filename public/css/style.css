@@ -411,6 +411,25 @@ div.paws_banner p {
     padding: 0 0 0 35px;
 }
 
+button {
+  padding:2px;
+  background-color: #ddf;
+  border: 1px solid #666;
+  color:#000;
+  text-decoration:none;
+  border-radius: 6px;
+  box-shadow:         1px 1px 2px 0px rgba(24, 38, 63, 0.75);
+}
+
+button:hover {
+    background-color: #eef;
+}
+
+button.annotate_button {
+    float: right;
+    width: 20px; height: 20px;
+}
+
 div.subtitle {
     margin: 0 0 10px 0;
     padding: 4px;

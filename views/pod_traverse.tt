@@ -22,11 +22,13 @@
 [% END %]
 
 [% BLOCK tt_head2 %]
+  [%# INCLUDE annotate_link.tt node=p_node %]
   <h3><a name="[% p_node.param('heading').text %]">[% INCLUDE pod_tt pod=p_node.param('heading') %]</a></h3>
   [% INCLUDE pod_tt pod=p_node %]
 [% END %]
 
 [% BLOCK tt_head3 %]
+[% head_chain.push(p_node.param('heading').text) %]
   <h4><a name="[% p_node.param('heading').text %]">[% INCLUDE pod_tt pod=p_node.param('heading') %]</a></h4>
   [% INCLUDE pod_tt pod=p_node %]
 [% END %]

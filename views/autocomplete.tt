@@ -31,7 +31,7 @@
 	<div class="fs_heading">Annotations</div>
 	[% FOREACH r IN results.annotations %]
 	<div class="result_line" paws_link="module:[% r.module %]">
-		[% r.title | html %]
+		[% r.module | html %]
 		<div class="result_sd">
 			[% INCLUDE pod_traverse.tt pod = r.pa %]
 		</div>

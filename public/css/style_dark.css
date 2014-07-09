@@ -734,6 +734,7 @@ div.result_line {
     height: 40px;
     padding: 0 5px 0 5px;
     margin-bottom: 5px;
+    cursor: pointer;
     overflow: hidden;
 }
 
@@ -745,4 +746,8 @@ div.hilight {
 div.result_line div.result_sd {
     font-size: 0.8em;
     color: #888;
+}
+
+div.result_line div.result_sd p {
+    margin: 1px 0 1px 0;
 }

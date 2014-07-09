@@ -232,38 +232,6 @@ any '/load' => sub {
         {layout => undef};
 };
 
-any '/search' => sub {
-    my $terms = params->{terms};
-    my $view = params->{view};
-    
-    my $pa = load_pa $terms;
-    
-    my ($name, $subtitle) = extract_title $pa;
-
-    if($view eq 'summary') {
-        my $summ = PodSummary->new->filter($pa);
-        $_->detach foreach $summ->select('/head1[@heading eq \'NAME\']');
-        $pa = $summ;
-    } elsif($view eq 'uncut') {
-        my $filter = Pod::Abstract::Filter::uncut->new;
-        $pa = $filter->filter($pa);
-    }
-    if(params->{overlay}) {
-        my ($overlay_list) = $pa->select("//begin[. =~ {^:overlay}](0)");
-        if($overlay_list) {
-            $pa = Pod::Abstract::Filter::overlay->new->filter($pa);
-        }
-    }
-    if(params->{sort}) {
-        $pa = Pod::Abstract::Filter::sort->new->filter($pa);
-    }
-    $name = $terms unless $name;
-    
-    template "display_module.tt", 
-        { title => $name, sub => $subtitle, pa => $pa }, 
-        {layout => undef};
-};
-
 any '/menu' => sub {
     my $terms = params->{key};
     
@@ -313,10 +281,29 @@ any '/complete' => sub {
         }
         );
     my $out_fn = [ map { $_->{_source} } @{$results->{hits}{hits}} ];
-        
+
+    $results = $e->search(
+        index => 'perldoc',
+        type => 'annotation',
+        _source => [ "module","pod" ],
+        body => {
+            query => {
+                multi_match => {
+                    query => $terms,
+                    fields => ["pod"]
+                }
+            }
+        }
+        );
+    my $out_anno = [ map { $_->{_source} } @{$results->{hits}{hits}} ];
+    foreach my $oa (@$out_anno) {
+        $oa->{pa} = Pod::Abstract->load_string("=pod\n\n".$oa->{pod});
+    }
+    
     my $out = {
         functions => $out_fn,
         modules => $out_mod,
+        annotations => $out_anno,
     };
     
     template "autocomplete.tt",

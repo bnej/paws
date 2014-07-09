@@ -1,4 +1,4 @@
-[% IF results.modules %]
+[% IF results.modules.size > 0 %]
 <div class="fs_section modules" id="fs_modules">
 	<div class="fs_heading">Modules</div>
 	[% FOREACH r IN results.modules %]
@@ -12,7 +12,7 @@
 </div>
 [% END %]
 
-[% IF results.functions %]
+[% IF results.functions.size > 0 %]
 <div class="fs_section functions" id="fs_functions">
 	<div class="fs_heading">Functions</div>
 	[% FOREACH r IN results.functions %]
@@ -20,6 +20,20 @@
 		[% r.title | html %]
 		<div class="result_sd">
 			[% r.shortdesc | html %]
+		</div>
+	</div>
+	[% END %]
+</div>
+[% END %]
+
+[% IF results.annotations.size > 0 %]
+<div class="fs_section annotations" id="fs_annotations">
+	<div class="fs_heading">Annotations</div>
+	[% FOREACH r IN results.annotations %]
+	<div class="result_line" paws_link="module:[% r.module %]">
+		[% r.title | html %]
+		<div class="result_sd">
+			[% INCLUDE pod_traverse.tt pod = r.pa %]
 		</div>
 	</div>
 	[% END %]

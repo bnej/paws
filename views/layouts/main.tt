@@ -38,6 +38,9 @@
 <div class="container_12 page_wrapper">
 [% content %]
 </div>
+<div id="edit_overlay" class="edit_overlay popover">
+</div>
+<div id="annotate_edit" class="annotate_edit popover" />
 </div>
 </body>
 </html>

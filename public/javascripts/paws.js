@@ -78,6 +78,7 @@ function display_document(name) {
     'pod_content','/load',
     { 
         parameters: { paws_key: name, overlay: f_overlay, sort: f_sort, view: f_view },
+        method: "POST",
         onSuccess: function(response) {
             recents.set(name, '1');
             current_document = name;
@@ -105,10 +106,77 @@ function display_document(name) {
             /* Trigger highlight.js */
             $$("pre code").each(function(elt) {
                 hljs.highlightBlock(elt);
-            })
+            });
+            attach_listeners();
         }
     }
     );
+}
+
+function attach_listeners() {
+    $$('button.annotate_button').each(function(elt) {
+        elt.observe("click",edit_annotation);
+    });
+}
+
+function overlay_on() {
+    var overlay = $('edit_overlay');
+    overlay.addClassName('on');
+    overlay.observe("click",overlay_off);
+}
+
+function overlay_off(ev) {
+    if(ev) ev.stop();
+    $$('.popover').each(function(overlay) {
+        overlay.removeClassName('on');
+    });
+}
+
+function edit_annotation(event) {
+    event.stop();
+    var elt = event.element();
+    var form = elt.up("form");
+    var params = form.serialize(true);
+
+    overlay_on();
+    var ed = $('annotate_edit');
+    ed.innerHTML = '<div class="loader" />'
+    ed.addClassName("on");
+    
+    new Ajax.Updater(ed,"/edit_annotation", {
+        parameters: params,
+        evalScripts: false,
+        method: "POST",
+        onComplete: function(transport) {
+            $('edit-save').observe("click",save_annotation)
+        }
+    });
+}
+
+function save_annotation(ev) {
+    var elt = event.element();
+    event.stop();
+    var form = elt.up(form);
+    var params = form.serialize(true);
+    
+    overlay_on();
+    var ed = $('annotate_edit');
+    ed.innerHTML = '<div class="loader" />'
+    
+    new Ajax.Request("/save_annotation", {
+        parameters: params,
+        evalScripts: false,
+        method: "POST",
+        onComplete: function(response) {
+            var resp = response.responseJSON;
+            if(resp.saved == 'yes') {
+                overlay_off();
+                var f = function() { display_document('module:' + params.module) };
+                f.delay(1);
+            }
+        }
+    });
+    
 }
 
 function load_recents() {

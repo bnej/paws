@@ -1,0 +1,7 @@
+[% IF title %]
+<form>
+	<input type="hidden" name="module" value="[% title | html %]" />
+	<input type="hidden" name="node_path" value="[% node.path_to | html %]" />
+	<button class="annotate_button">+</button>
+</form>
+[% END %]

@@ -7,10 +7,11 @@ use Pod::Abstract::Filter::summary;
 use Pod::Abstract::Filter::overlay;
 use Pod::Abstract::Filter::uncut;
 use Pod::Abstract::Filter::sort;
+use POSIX qw(strftime);
 use PodSummary;
 use PAWS::Indexer;
 use Pod::Abstract::BuildNode qw(node);
-
+use Digest::MD5 qw(md5_hex);
 use Search::Elasticsearch;
 
 our $VERSION = '0.1';
@@ -70,6 +71,69 @@ sub load_pa($) {
     }
 }
 
+sub load_annotation {
+    my $module = shift;
+    my $key = shift;
+    
+    my $digest_key = md5_hex($module . '|' . $key);
+    my $e = elastic;
+    my $results = $e->mget(
+            index   => 'perldoc',
+            type    => 'annotation',
+            body    => {
+                docs => [
+                    { _id => $digest_key},
+                ]
+            }
+        );
+    my $doc = $results->{docs}[0];
+    
+    if($doc->{_source}) {
+        return $doc->{_source}{pod};
+    } else {
+        return '';
+    }
+}
+
+sub load_annotations {
+    my $module = shift;
+    
+    my $e = elastic();
+    my $results = $e->search(
+        index => 'perldoc',
+        type => 'annotation',
+        _source => ['date','module','doc_path','pod'],
+        body => {
+            "query" => {
+                "filtered" => {
+                    "filter" => {
+                        "term" => {
+                	        "module" => $module
+            	        }
+                	}
+                }
+            }
+        }
+        );
+    my %anno = map { 
+        $_->{_source}{doc_path} => Pod::Abstract->load_string("=pod\n\n".$_->{_source}{pod})
+    } @{$results->{hits}{hits}};
+    
+    return \%anno
+}
+
+sub merge_annotations {
+    my $pod = shift; my $anno = shift;
+    
+    for my $node ($pod->select("//[\@heading | \@label]")) {
+        my $path = $node->path_to;
+        if(my $ap = $anno->{$path}) {
+            $ap->type('annotation'); # Force a type change - special case.
+            $node->unshift($ap);
+        }
+    }
+}
+
 sub extract_title($) {
     my $pa = shift;
     my ($name_para) = $pa->select("/head1[\@heading eq 'NAME']/:paragraph");
@@ -88,7 +152,49 @@ get '/' => sub {
     template 'index';
 };
 
+post '/edit_annotation' => sub {
+    my $module = params->{module};
+    my $node_path = params->{node_path};
+    
+    my $anno = load_annotation($module,$node_path);
+    
+    template "editor",
+        { module => $module, node_path => $node_path, annotation => $anno },
+        { layout => undef };
+};
+
+post "/save_annotation" => sub {
+    my $module = params->{module};
+    my $node_path = params->{node_path};
+
+    my $annotation = params->{annotation};
+    $annotation =~ s/\r\n/\n/g;
+    my $digest_key = md5_hex($module . '|' . $node_path);
+    my $time_string = strftime('%Y-%m-%d', localtime(time));
+    
+    my $e = elastic;
+    $e->index(
+        index => 'perldoc',
+        type => 'annotation',
+        id => $digest_key,
+        body => {
+            pod => $annotation,
+            module => $module,
+            doc_path => $node_path,
+        	date => $time_string,
+        	updated_by => 'web',
+    	},
+        );
+    
+    return { saved => 'yes' };
+};
+
+get "/js_poke" => sub {
+    return { im_json => 'yes', im_batman => 'no' };
+};
+
 any '/load' => sub {
+    header('Cache-Control' =>  'no-store, no-cache, must-revalidate');
     my $key = params->{paws_key};
     my $view = params->{view};
     
@@ -115,6 +221,11 @@ any '/load' => sub {
     }
     my ($doctype,$id) = split_key $key;
     $name = $id unless $name;
+
+    if($doctype eq 'module') {
+        my $anno = load_annotations($name);
+        merge_annotations($pa, $anno);
+    }
     
     template "display_module.tt", 
         { title => $name, sub => $subtitle, pa => $pa }, 

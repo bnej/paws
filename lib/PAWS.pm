@@ -117,7 +117,7 @@ sub load_annotations {
         );
     my %anno = map { 
         $_->{_source}{doc_path} => Pod::Abstract->load_string("=pod\n\n".$_->{_source}{pod})
-    } @{$results->{hits}{hits}};
+    } grep { $_->{_source}{pod} !~ m/^\s*$/ } @{$results->{hits}{hits}};
     
     return \%anno
 }

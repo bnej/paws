@@ -193,68 +193,76 @@ function display_document(name) {
 
 function attach_listeners() {
     $('button.annotate_button').each(function(elt) {
-        $(elt).bind("click",edit_annotation);
+        console.log(this);
+        $(this).on("click",edit_annotation);
     });
 }
 
 function overlay_on() {
-    var overlay = $('edit_overlay');
+    var overlay = $('#edit_overlay');
+    console.log(overlay);
     overlay.addClass('on');
-    $(overlay).observe("click",overlay_off);
+    $(overlay).on("click",overlay_off);
 }
 
 function overlay_off(ev) {
-    if(ev) ev.stop();
-    $('.popover').each(function(overlay) {
-        overlay.removeClass('on');
-    });
+    if(ev) ev.stopPropagation();
+    $('.popover').removeClass('on');
+    
+    return false;
 }
 
 function edit_annotation(event) {
-    event.stop();
-    var elt = event.element();
-    var form = elt.parent("form");
-    var params = form.serialize(true);
+    event.stopPropagation();
+    var elt = this;
+    var form = $(elt).parent("form");
+    var params = form.serialize();
 
     overlay_on();
-    var ed = $('annotate_edit');
+    var ed = $('#annotate_edit');
     ed.innerHTML = '<div class="loader" />'
     ed.addClass("on");
     
-    new Ajax.Updater(ed,"/edit_annotation", {
-        parameters: params,
-        evalScripts: false,
-        method: "POST",
-        onComplete: function(transport) {
-            $('edit-save').observe("click",save_annotation)
+    new $.ajax({
+        url: "/edit_annotation",
+        type: "post",
+        dataType: "html",
+        data: params,
+        success: function(response) {
+            $(ed).html(response);
+            $('#edit-save').on("click",save_annotation);
         }
     });
+
+    return false;
 }
 
 function save_annotation(ev) {
-    var elt = event.element();
-    event.stop();
-    var form = elt.parent(form);
-    var params = form.serialize(true);
+    var elt = this;
+    ev.stopPropagation();
+    var form = $(elt).parent("form");
+    var params = form.serialize();
+    var module_name = form.children('[name="module"]').val()
     
     overlay_on();
     var ed = $('annotate_edit');
     ed.innerHTML = '<div class="loader" />'
     
-    new Ajax.Request("/save_annotation", {
-        parameters: params,
-        evalScripts: false,
-        method: "POST",
-        onComplete: function(response) {
-            var resp = response.responseJSON;
-            if(resp.saved == 'yes') {
+    new $.ajax({
+        url: "/save_annotation",
+        type: "post",
+        dataType: "json",
+        data: params,
+        success: function(response) {
+            if(response.saved == 'yes') {
                 overlay_off();
-                var f = function() { display_document('module:' + params.module) };
-                f.delay(1);
+                var f = function() { display_document('module:' + module_name) };
+                _.delay(f,1000);
             }
         }
     });
     
+    return false;
 }
 
 function load_recents() {

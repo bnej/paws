@@ -1,0 +1,3 @@
+=head1 I am a perldoc
+
+woo!

@@ -22,7 +22,7 @@ return <<EOF;
 
 =head1 NAME
 
-Error - Couldn't find a document called $term
+Error 404 - Couldn't find a document called $term
 
 =head1 DESCRIPTION
 
@@ -149,6 +149,7 @@ sub extract_title($) {
 }
 
 get '/' => sub {
+    set layout => 'main.tt';
     template 'index';
 };
 
@@ -349,6 +350,21 @@ any '/links' => sub {
     template "links.tt", 
         { links => \@links }, 
         { layout => undef };
+};
+
+get qr{.*} => sub {
+    set layout => 'uikit_doc.tt';
+    my $path = request->path;
+    
+    my $pa;
+    if(-e "pod_public/$path") {
+        $pa = Pod::Abstract->load_file("pod_public/$path");
+    } else {
+        status 'not_found';
+        $pa = Pod::Abstract->load_string(error_doc($path));
+    }
+    
+    template "perldoc.tt", { pa => $pa };
 };
 
 true;

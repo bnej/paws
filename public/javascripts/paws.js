@@ -1,6 +1,86 @@
 
-var recents = new Hash();
+var recents = { };
 var current_document;
+
+var KEY_LEFT = 37;
+var KEY_UP = 38;
+var KEY_RIGHT = 39;
+var KEY_DOWN = 40;
+var KEY_RETURN = 13;
+
+(function(){
+  var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
+ 
+  // The base Class implementation (does nothing)
+  this.Class = function(){};
+ 
+  // Create a new Class that inherits from this class
+  Class.extend = function(prop) {
+    var _super = this.prototype;
+   
+    // Instantiate a base class (but only create the instance,
+    // don't run the init constructor)
+    initializing = true;
+    var prototype = new this();
+    initializing = false;
+   
+    // Copy the properties over onto the new prototype
+    for (var name in prop) {
+      // Check if we're overwriting an existing function
+      prototype[name] = typeof prop[name] == "function" &&
+        typeof _super[name] == "function" && fnTest.test(prop[name]) ?
+        (function(name, fn){
+          return function() {
+            var tmp = this._super;
+           
+            // Add a new ._super() method that is the same method
+            // but on the super-class
+            this._super = _super[name];
+           
+            // The method only need to be bound temporarily, so we
+            // remove it when we're done executing
+            var ret = fn.apply(this, arguments);        
+            this._super = tmp;
+           
+            return ret;
+          };
+        })(name, prop[name]) :
+        prop[name];
+    }
+   
+    // The dummy class constructor
+    function Class() {
+      // All construction is actually done in the init method
+      if ( !initializing && this.init )
+        this.init.apply(this, arguments);
+    }
+   
+    // Populate our constructed prototype object
+    Class.prototype = prototype;
+   
+    // Enforce the constructor to be what we expect
+    Class.prototype.constructor = Class;
+ 
+    // And make this class extendable
+    Class.extend = arguments.callee;
+   
+    return Class;
+  };
+})();
+
+(function($){
+    $.getQuery = function( query ) {
+        query = query.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+        var expr = "[\\?&]"+query+"=([^&#]*)";
+        var regex = new RegExp( expr );
+        var results = regex.exec( window.location.href );
+        if( results !== null ) {
+            return decodeURIComponent(results[1].replace(/\+/g, " "));
+        } else {
+            return false;
+        }
+    };
+})(jQuery);
 
 function setActiveStyleSheet(title) {
    var i, a, main;
@@ -70,78 +150,76 @@ function refresh_document() {
 
 function display_document(name) {
     
-    var f_overlay = $F('overlay');
-    var f_view = $F('view');
-    var f_sort = $F('sort');
+    var f_overlay = $('#overlay').val;
+    var f_view = $('#view').val;
+    var f_sort = $('#sort').val;
     
-    new Ajax.Updater(
-    'pod_content','/load',
-    { 
-        parameters: { paws_key: name, overlay: f_overlay, sort: f_sort, view: f_view },
-        method: "POST",
-        onSuccess: function(response) {
-            recents.set(name, '1');
+    new $.ajax({
+        url: '/load',
+        type: "get",
+        dataType: "html",
+        data: { paws_key: name, overlay: f_overlay, sort: f_sort, view: f_view },
+        success: function(response){
+            $('#pod_content').html(response);
+            recents[name] = 1;
             current_document = name;
             var el = update_recents(name);
-            el.setStyle({
-                backgroundColor: "#ffff99"
+            el.addClass('uk-button-success');
+            el.hide().fadeIn(500);
+            $.ajax({
+                url: "/menu", type: "get", dataType: "html",
+                data: {key: name},
+                success: function(r){ $('#menu').html(r) }
             });
-            new Effect.Shake(el,{duration: 0.2, distance: 4});
-            
-            new Ajax.Updater(
-                'menu','/menu',
-                {parameters: {key: name}}
-                );
-            new Ajax.Updater(
-                'doc_links','/links',
-                {parameters: {key: name}}
-                );
-            new Ajax.Updater(
-                'inbound_links','/inbound_links',
-                {parameters: {key: name}}
-                );
-            
-        },
-        onComplete: function(response) {
+            $.ajax({
+                url: "/links", type: "get", dataType: "html",
+                data: {key: name},
+                success: function(r){ $('#links').html(r) }
+            });
+            $.ajax({
+                url: "/inbound_links", type: "get", dataType: "html",
+                data: {key: name},
+                success: function(r){ $('#inbound_links').html(r) }
+            });
+
             /* Trigger highlight.js */
-            $$("pre code").each(function(elt) {
-                hljs.highlightBlock(elt);
+            $("pre code").each(function() {
+                hljs.highlightBlock(this);
             });
             attach_listeners();
         }
-    }
-    );
+    });
 }
 
 function attach_listeners() {
-    $$('button.annotate_button').each(function(elt) {
-        elt.observe("click",edit_annotation);
+    $('button.annotate_button').each(function(elt) {
+        $(elt).bind("click",edit_annotation);
     });
 }
 
 function overlay_on() {
     var overlay = $('edit_overlay');
-    overlay.addClassName('on');
-    overlay.observe("click",overlay_off);
+    overlay.addClass('on');
+    $(overlay).observe("click",overlay_off);
 }
 
 function overlay_off(ev) {
     if(ev) ev.stop();
-    $$('.popover').each(function(overlay) {
-        overlay.removeClassName('on');
+    $('.popover').each(function(overlay) {
+        overlay.removeClass('on');
     });
 }
 
 function edit_annotation(event) {
     event.stop();
     var elt = event.element();
-    var form = elt.up("form");
+    var form = elt.parent("form");
     var params = form.serialize(true);
 
     overlay_on();
     var ed = $('annotate_edit');
     ed.innerHTML = '<div class="loader" />'
-    ed.addClassName("on");
+    ed.addClass("on");
     
     new Ajax.Updater(ed,"/edit_annotation", {
         parameters: params,
@@ -156,7 +234,7 @@ function edit_annotation(event) {
 function save_annotation(ev) {
     var elt = event.element();
     event.stop();
-    var form = elt.up(form);
+    var form = elt.parent(form);
     var params = form.serialize(true);
     
     overlay_on();
@@ -180,44 +258,43 @@ function save_annotation(ev) {
 }
 
 function load_recents() {
-    var params = document.URL.toQueryParams();
-    var d = params.d;
-    var c = params.c;
+    var d = $.getQuery('d');
+    var c = $.getQuery('c');
     
+    if(!(d || c))
+        return;
     var all = d.split(",");
-    all.each(function(x) { recents.set(x,1); });
+    _.each(all,function(x) { recents[x] = 1; });
     display_document(c);
 }
 
 function update_recents(name) { // returns the element created for "name" if possible
     var out = null;
-    $(recent_searches).childElements().each(function(e) { e.remove() });
+    $(recent_searches).children().each(function() { this.remove() });
     history.pushState( {
       old_text: "PAWS",
       new_text: "PAWS",
-      slug: ("?d=" + recents.keys().sort().join(",") + "&c=" + current_document)
-    }, null, ("?d=" + recents.keys().sort().join(",")) + "&c=" + current_document);
+      slug: ("?d=" + _.keys(recents).sort().join(",") + "&c=" + current_document)
+    }, null, ("?d=" + _.keys(recents).sort().join(",")) + "&c=" + current_document);
     
-    recents.keys().sort().each( function(k) {
+    _.each(_.keys(recents).sort(), function(k) {
         var pm = /^([a-z]+):(.*)$/;
         var match = pm.exec(k);
-        var label = match[2];
-        var doctype = match[1];
+        if(match){
+            var label = match[2];
+            var doctype = match[1];
         
-        var li = new Element('li');
-        var a = new Element("a",{ href: "#", onClick: "display_document('"+k+"')" });
-        var x = new Element("a",{ href: "#", 'onClick': "kill_recent('"+k+"')", 'class': "close"});
+            var li = $("<li class='uk-button'></li>");
+            var a = $("<a class='' href='#'>"+label+"</a>"); a.attr("onClick","display_document('"+k+"')" );
+            var x = $("<a href='#' class='close'>&times;</a>"); x.attr( 'onClick', "kill_recent('"+k+"')");
         
-        a.appendChild(document.createTextNode(label));
-        x.appendChild(document.createTextNode("×"));
+            li.append(x);
+            li.append(a);
 
-        li.appendChild(x);
-        li.appendChild(a);
-
-        $(recent_searches).insert(
-            {bottom: li});
-        if(name == k) {
-            out = li;
+            $(recent_searches).append(li);
+            if(name == k) {
+                out = li;
+            }
         }
     });
     return out;
@@ -225,187 +302,191 @@ function update_recents(name) { // returns the element created for "name" if pos
 
 function kill_recent(k) {
     var el = update_recents(k);
-    recents.unset(k);
-    
-    new Effect.DropOut(el,{
-        afterFinish: function(){ update_recents() }
+    el.fadeOut(500,function() {
+        delete recents[k];
+        update_recents();
     });
 }
 
-PAWS_FastSearch = Class.create();
-PAWS_FastSearch.prototype = {
-    initialize: function(field,request_path) {
-        var obj = this;
-        obj.s_field = field;
-        obj.s_path = request_path;
-        obj.keynav = false;
-        obj.initializeElements();
-    },
-    initializeElements: function() {
-        var fs_field = $(this.s_field);
-        var div_name = "paws_fsearch";
-        var obj = this;
-        
-        this.prev_value = this.terms();
-        this.has_results = false;
-        this.px = new PeriodicalExecuter(obj.fs_load_praps.bind(obj),0.5);
-        this.ajax_active = false;
-        this.key_select = false;
-        
-        var div = $(div_name);
-        if (div) {
-            fs_field.observe("focus", obj.fs_focus.bind(obj));
-            fs_field.observe("blur", obj.fs_blur.bind(obj));
-            fs_field.observe("keydown", obj.fs_keynav.bind(obj));
-        }
-  },
-  fs_div: function() {
-      var div_name = "paws_fsearch";
-      return $(div_name);
-  },
-  fs_load_praps: function() {
-      if(this.prev_value != this.terms()) {
-          if(!this.ajax_active) {
-              this.fs_load();
-          }
-      }
-  },
-  fs_focus: function() {
-      if( this.has_results ) {
-          this.fs_show()
-      }
-  },
-  fs_blur: function() {
-      this.fs_hide();
-  },
-  fs_hide: function() {
-      var obj = this;
-      var f = function() {
-          obj.fs_div().hide();
-      }.delay(0.2);  
-  },
-  fs_show: function() {
-      this.fs_div().show();
-  },
-  fs_mousefollow: function(lines) {
-      var obj = this;
-      lines.each( function(e) {
-          e.observe('mouseover',function(event) {
-              obj.fs_result_over(event, e);
-          });
-          e.observe('click',function(event) {
-              obj.fs_result_click(event, e);
-          });
-      });
-  },
-  fs_result_over: function(ev,elt) {
-      if(this.selected_elt != null) {
-          this.selected_elt.removeClassName("hilight");
-      }
-      this.selected_elt = elt;
-      this.keynav = false;
-      elt.addClassName("hilight");
-  },
-  fs_keynav: function(ev) {
-      if(ev.keyCode == Event.KEY_UP || ev.keyCode == Event.KEY_DOWN) {
-          var next_el = this.fs_div().select(".result_line").first();
-          if(this.selected_elt != null) {
-              switch (ev.keyCode) {
-              case Event.KEY_UP:
-                  next_el = this.selected_elt.previous(".result_line");
-                  break;
-              case Event.KEY_DOWN:
-                  next_el = this.selected_elt.next(".result_line");
-                  break;
-              }
-          }
-          if(next_el) {
-              if(this.selected_elt)
-                  this.selected_elt.removeClassName("hilight");
-              this.selected_elt = next_el;
-              this.selected_elt.addClassName("hilight");
-              this.keynav = true;
-          }
-          ev.stop();
-      } else if(this.keynav && 
-                this.selected_elt &&
-                (ev.keyCode == Event.KEY_LEFT || ev.keyCode == Event.KEY_RIGHT)) {
-          var sibs = this.selected_elt.previousSiblings();
-          var position = sibs.length - 1; /* one for heading */
-          var column = this.selected_elt.up(".fs_section");
-          var next_el = null;
-          switch (ev.keyCode) {
-              case Event.KEY_LEFT:
-                next_col = column.previous(".fs_section");
-                break;
-              case Event.KEY_RIGHT:
-                next_col = column.next(".fs_section");
-                break;
-          }
-          if(next_col) {
-              var col_results = next_col.select(".result_line");
-              if(col_results.length < position) {
-                  next_el = col_results.last();
-              } else {
-                  next_el = col_results[position];
-              }
-              if(next_el) {
-                  if(this.selected_elt)
-                      this.selected_elt.removeClassName("hilight");
-                  this.selected_elt = next_el;
-                  this.selected_elt.addClassName("hilight");
-              }
-          }
-          ev.stop()
-      } else if(ev.keyCode != Event.KEY_RETURN) {
-          this.keynav = false;
-      }
+var PAWS_FastSearch = Class.extend({
+      init: function(field,request_path) {
+          var obj = this;
+          obj.s_field = field;
+          obj.s_path = request_path;
+          obj.keynav = false;
+          obj.initializeElements();
+      },
+      px: function() {
+          var obj = this;
+          this.fs_load_praps();
+          setTimeout(function() { obj.px() }, 500 )
+      },
+      initializeElements: function() {
+          var fs_field = $('#'+this.s_field);
+          var div_name = "paws_fsearch";
+          var obj = this;
 
-      if(ev.keyCode == Event.KEY_RETURN) {
-          if(this.keynav && this.selected_elt) {
-              var paws_link = this.selected_elt.readAttribute('paws_link')
-              display_document(paws_link);
-              ev.stop();
+          this.prev_value = this.terms();
+          this.has_results = false;
+          this.px(); // Start periodic execute on this.px every half second
+          this.ajax_active = false;
+          this.key_select = false;
+
+          var div = $(div_name);
+          if (div) {
+              $(fs_field).on("focus", function(event) { obj.fs_focus() } );
+              $(fs_field).on("blur", function(event) { obj.fs_blur() } );
+              $(fs_field).keydown( function(event) { obj.fs_keynav(event) } );
           }
-      }
-      
-  },
-  fs_result_click: function(ev,elt) {
-      var paws_link = elt.readAttribute('paws_link')
-      display_document(paws_link);
-  },
-  fs_load: function() {
-      var div = this.fs_div();
-      var path = this.s_path;
-      var obj = this;
-      var tval = this.terms();
-      this.ajax_active = true;
-      new Ajax.Updater(div,path, {
-          parameters: { "terms" : tval },
-          evalScripts: false,
-          method: "GET",
-          onComplete: function(transport) {
-              var response_divs = div.select("div.fs_section");
-              var section_count = response_divs.length;
-              div.setStyle({width: '' + (300 * section_count) + 'px', position: 'absolute'})
-              obj.ajax_active = false;
-              obj.selected_elt = null;
-              
-              var total_lines = div.select("div.result_line");
-              if(total_lines.length == 0) {
-                  obj.fs_hide();
-                  return true;
-              } else {
-                  obj.has_results = true;
-                  obj.fs_div().show();
-                  obj.fs_mousefollow(total_lines);
-                  obj.prev_value = tval;
-              }
-          }
-      }
-      );
-  },
-  terms: function() {
-      return $(this.s_field).getValue();
-  }
-}
+    },
+    fs_div: function() {
+        var div_name = "paws_fsearch";
+        return $('#'+div_name);
+    },
+    fs_load_praps: function() {
+        if(this.prev_value != this.terms()) {
+            if(!this.ajax_active) {
+                this.fs_load();
+            }
+        }
+    },
+    fs_focus: function() {
+        if( this.has_results ) {
+            this.fs_show()
+        }
+    },
+    fs_blur: function() {
+        this.fs_hide();
+    },
+    fs_hide: function() {
+        var obj = this;
+        setTimeout( function() {
+            obj.fs_div().css('display','none');
+        },200 );  
+    },
+    fs_show: function() {
+        this.fs_div().show();
+    },
+    fs_mousefollow: function(lines) {
+        var obj = this;
+        lines.each( function() {
+            $(this).on('mouseover',function(event) {
+                obj.fs_result_over(event, this);
+            });
+            $(this).on('click',function(event) {
+                obj.fs_result_click(event, this);
+            });
+        });
+    },
+    fs_result_over: function(ev,elt) {
+        if(this.selected_elt != null) {
+            $(this.selected_elt).removeClass("hilight");
+        }
+        this.selected_elt = elt;
+        this.keynav = false;
+        $(elt).addClass("hilight");
+    },
+    fs_keynav: function(ev) {
+        console.log(ev);
+        if(ev.which == KEY_UP || ev.which == KEY_DOWN) {
+            var next_el = this.fs_div().find(".result_line").first();
+            if(this.selected_elt != null) {
+                switch (ev.which) {
+                case KEY_UP:
+                    next_el = $(this.selected_elt).prev(".result_line");
+                    break;
+                case KEY_DOWN:
+                    next_el = $(this.selected_elt).next(".result_line");
+                    break;
+                }
+            }
+            if(next_el.length > 0) {
+                if(this.selected_elt)
+                    $(this.selected_elt).removeClass("hilight");
+                this.selected_elt = next_el;
+                $(this.selected_elt).addClass("hilight");
+                this.keynav = true;
+            }
+            ev.stopPropagation();
+        } else if(this.keynav && 
+                  this.selected_elt &&
+                  (ev.which == KEY_LEFT || ev.which == KEY_RIGHT)) {
+            var sibs = $(this.selected_elt).prevAll();
+            var position = sibs.length - 1; /* one for heading */
+            var column = $(this.selected_elt).parent(".fs_section");
+            var next_el = null;
+            switch (ev.which) {
+                case KEY_LEFT:
+                  next_col = $(column).prev(".fs_section");
+                  break;
+                case KEY_RIGHT:
+                  next_col = $(column).next(".fs_section");
+                  break;
+            }
+            if(next_col.length > 0) {
+                var col_results = next_col.children(".result_line");
+                if(col_results.length <= position) {
+                    next_el = col_results.last();
+                } else {
+                    next_el = col_results[position];
+                }
+                if(next_el) {
+                    if(this.selected_elt)
+                        $(this.selected_elt).removeClass("hilight");
+                    this.selected_elt = next_el;
+                    $(this.selected_elt).addClass("hilight");
+                }
+            }
+            ev.stopPropagation()
+        } else if(ev.which != KEY_RETURN) {
+            this.keynav = false;
+        }
+
+        if(ev.which == KEY_RETURN) {
+            if(this.keynav && this.selected_elt) {
+                var paws_link = $(this.selected_elt).attr('paws_link')
+                display_document(paws_link);
+                ev.stopPropagation();
+            }
+        }
+
+    },
+    fs_result_click: function(ev,elt) {
+        var paws_link = $(elt).attr('paws_link')
+        display_document(paws_link);
+    },
+    fs_load: function() {
+        var div = this.fs_div();
+        var path = this.s_path;
+        var obj = this;
+        var tval = this.terms();
+        this.ajax_active = true;
+        $.ajax({
+            url: path, type: "get", dataType: "html",
+            data: { terms: tval },
+            success: function(response){
+                var response_divs = $(div).html(response).find(".fs_section");
+                
+                var section_count = response_divs.length;
+                div.css('width', '' + (300 * section_count) + 'px')
+                div.css('position', 'absolute')
+                obj.ajax_active = false;
+                obj.selected_elt = null;
+
+                var total_lines = div.find(".result_line");
+                if(total_lines.length == 0) {
+                    obj.fs_hide();
+                    return true;
+                } else {
+                    obj.has_results = true;
+                    obj.fs_div().css('display','block');
+                    obj.fs_mousefollow(total_lines);
+                    obj.prev_value = tval;
+                }
+            }
+        });
+    },
+    terms: function() {
+        return $('#'+this.s_field).val();
+    }
+});

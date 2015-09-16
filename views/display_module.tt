@@ -1,4 +1,4 @@
 <h1>[% title | html %]</h1>
-<div class="subtitle">[% sub %]</div>
+<h3>[% sub %]</h3>
 
 [% INCLUDE pod_traverse.tt pod = pa %]

@@ -1,0 +1,11 @@
+<div class="uk-grid uk-grid-divider" style="padding: 80px 0">
+	<div class="uk-width-1-4 uk-hidden-small uk-grid-small">
+		<ul class="uk-nav uk-nav-side">
+		    <li><a href="#">About PAWS</a></li>
+		    <li class="uk-active"><a href="#">Hi</a></li>
+		</ul>
+	</div>
+	<div class="uk-width-3-4 uk-grid-small" >
+	[% INCLUDE pod_traverse.tt pod = pa %]
+	</div>
+</div>

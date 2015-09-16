@@ -473,7 +473,10 @@ var PAWS_FastSearch = Class.extend({
                 var response_divs = $(div).html(response).find(".fs_section");
                 
                 var section_count = response_divs.length;
-                div.css('width', '' + (300 * section_count) + 'px')
+                div.attr("class","uk-grid uk-grid-small");
+                div.addClass("uk-width-medium-"+section_count+"-4");
+                div.addClass("uk-width-small-1-1");
+//                div.css('width', '' + (300 * section_count) + 'px')
                 div.css('position', 'absolute')
                 obj.ajax_active = false;
                 obj.selected_elt = null;

@@ -6,10 +6,6 @@ font-size: 12px;
 color: #333;
 }
 
-input.search {
-    width: 85px;
-}
-
 dt {
     font-weight: bold;
     color: #444;
@@ -304,8 +300,6 @@ div#paws_fsearch {
 }
 
 div.fs_section {
-    width: 290px;
-    margin: 0 5px 0 5px;
     float: left;
 }
 

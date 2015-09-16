@@ -150,9 +150,9 @@ function refresh_document() {
 
 function display_document(name) {
     
-    var f_overlay = $('#overlay').val;
-    var f_view = $('#view').val;
-    var f_sort = $('#sort').val;
+    var f_overlay = $('#overlay').val();
+    var f_view = $('#view').val();
+    var f_sort = $('#sort').val();
     
     new $.ajax({
         url: '/load',
@@ -193,14 +193,12 @@ function display_document(name) {
 
 function attach_listeners() {
     $('button.annotate_button').each(function(elt) {
-        console.log(this);
         $(this).on("click",edit_annotation);
     });
 }
 
 function overlay_on() {
     var overlay = $('#edit_overlay');
-    console.log(overlay);
     overlay.addClass('on');
     $(overlay).on("click",overlay_off);
 }

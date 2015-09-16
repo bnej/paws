@@ -150,9 +150,9 @@ function refresh_document() {
 
 function display_document(name) {
     
-    var f_overlay = $('#overlay').val();
+    var f_overlay = $('#overlay:checked').val();
     var f_view = $('#view').val();
-    var f_sort = $('#sort').val();
+    var f_sort = $('#sort:checked').val();
     
     new $.ajax({
         url: '/load',
@@ -393,7 +393,6 @@ var PAWS_FastSearch = Class.extend({
         $(elt).addClass("hilight");
     },
     fs_keynav: function(ev) {
-        console.log(ev);
         if(ev.which == KEY_UP || ev.which == KEY_DOWN) {
             var next_el = this.fs_div().find(".result_line").first();
             if(this.selected_elt != null) {

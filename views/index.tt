@@ -1,20 +1,5 @@
-<div class="uk-width-1-4 uk-hidden-small uk-grid-small">
+<div class="uk-width-medium-1-4 uk-hidden-small uk-grid-small">
 		<div class="uk-panel">
-			<form class="uk-form" onSubmit="return false;" accept-charset="utf-8">
-				<fieldset id="search_for_modules_or_functions"
-				 		  class="clearfix uk-search">
-					<div style="float: right; position: relative;">
-						<input type="text" size="25" name="terms" id="terms" autocomplete="off" class="uk-search-field"/>
-						<div id="paws_fsearch" style="display: none; positon: absolute; left: 0px; top: 30px;">
-						</div>
-					</div>
-					<script>
-					new PAWS_FastSearch(
-						'terms','/complete'
-						);
-					</script>
-				</fieldset>
-			</form>
 			<form class="uk-form" onSubmit="return false;" accept-charset="utf-8">
 		
 				<fieldset id="options"
@@ -46,7 +31,7 @@
 			</ul>
 		</div>
 	</div>
-	<div class="uk-width-3-4">
+	<div class="uk-width-medium-3-4 uk-width-small-1-1">
 		<div class="uk-panel-box uk-panel">
 			<ul id="recent_searches">
 				

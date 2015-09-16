@@ -23,6 +23,22 @@
 </head>
 <body>
 	<nav class="uk-navbar uk-navbar-attached">
+		<div class="uk-navbar-flip">
+	        <div class="uk-navbar-content">
+					<form class="uk-search" onSubmit="return false;" accept-charset="utf-8">
+					<input size="50" name="terms" id="terms" autocomplete="off" type="search" class="uk-search-field" placeholder="search..."/>
+					</form>
+					<div style="position:relative">
+					<div id="paws_fsearch" style="display: none; positon: absolute; right: 0px; top: 0px;">
+					</div>
+					</div>
+				<script>
+				new PAWS_FastSearch(
+					'terms','/complete'
+					);
+				</script>
+			</div>
+		</div>
 		<div class="uk-container uk-container-center">
 			<a href="" data-uk-tooltip="{pos:'bottom'}" title="You know, for POD" class="uk-navbar-brand"><i class="uk-icon-paw"></i> PAWS</a>
 			<ul class="uk-navbar-nav">
@@ -31,6 +47,7 @@
 				</li>
 			</ul>
 		</div>
+	    
 	</nav>
 
 	<div class="uk-container uk-container-center">

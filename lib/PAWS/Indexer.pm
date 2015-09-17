@@ -8,6 +8,9 @@ use POSIX qw(strftime);
 use Pod::Abstract::Node;
 use Pod::Abstract::BuildNode qw(node);
 
+use File::Spec;
+use File::Basename;
+
 use strict;
 use warnings;
 
@@ -15,6 +18,11 @@ sub index_file {
     my $class = shift;
     my $e = shift; 
     my $filename = shift;
+    
+    my ($basename,$path,$suffix) = fileparse($filename,'.pm','.pod','.pl');
+    
+    my @dirs = grep { $_ && $_ !~ /^(lib|bin|doc)$/ } 
+        File::Spec->splitdir( $path . $basename );
 
     my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
                           $atime,$mtime,$ctime,$blksize,$blocks)
@@ -27,6 +35,35 @@ sub index_file {
 
     return 0 unless $title;
 
+    my @func_indexed = $class->index_functions($pa, $time_string, $e);
+
+    my @head2 = map { $_->text }  $pa->select('//head2@heading');
+
+    $e->index(
+        index => 'perldoc',
+        type => 'module',
+        id => $title,
+        body => {
+        	title => $title,
+        	shortdesc => $shortdesc,
+        	pod => $pa->pod,
+        	head2 => [ @head2 ],
+        	links_to => [ map { $_->text } $class->links($pa) ],
+        	dirs => [ @dirs ],
+        	date => $time_string,
+        }
+        );
+    
+    return (scalar(@func_indexed) + 1)
+}
+
+sub index_functions {
+    my $class = shift;
+    my $pa = shift;
+    my $time_string = shift;
+    my $e = shift;
+    
+    my ($title, $shortdesc) = PAWS::extract_title($pa);
     my @func_h2 = $pa->select('/head1[@heading =~ {METHODS|FUNCTIONS}]/head2');
 
     foreach my $f (@func_h2) {
@@ -38,7 +75,7 @@ sub index_file {
             if($synopsis) {
                 $short = $synopsis->pod;
             }
-            
+        
             # If it doesn't appear in the cut nodes below, and doesn't have a
             # synopsis, skip it.
             next unless $in_cut || $synopsis;
@@ -57,24 +94,8 @@ sub index_file {
         	},
             );
     }
-
-    my @head2 = map { $_->text }  $pa->select('//head2@heading');
-
-    $e->index(
-        index => 'perldoc',
-        type => 'module',
-        id => $title,
-        body => {
-        	title => $title,
-        	shortdesc => $shortdesc,
-        	pod => $pa->pod,
-        	head2 => [ @head2 ],
-        	links_to => [ map { $_->text } $class->links($pa) ],
-        	date => $time_string,
-        }
-        );
     
-    return (scalar(@func_h2) + 1)
+    return @func_h2;
 }
 
 sub links {

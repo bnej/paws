@@ -300,11 +300,16 @@ any '/complete' => sub {
     foreach my $oa (@$out_anno) {
         $oa->{pa} = Pod::Abstract->load_string("=pod\n\n".$oa->{pod});
     }
+    my $columns = 0;
+    $columns += 1 if @$out_anno > 0;
+    $columns += 1 if @$out_fn > 0;
+    $columns += 1 if @$out_mod > 0;
     
     my $out = {
         functions => $out_fn,
         modules => $out_mod,
         annotations => $out_anno,
+        columns => $columns
     };
     
     template "autocomplete.tt",

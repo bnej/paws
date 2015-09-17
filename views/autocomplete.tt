@@ -1,5 +1,5 @@
 [% IF results.modules.size > 0 %]
-<div class="fs_section uk-width-medium-1-3 uk-width-small-1-1 modules" id="fs_modules">
+<div class="fs_section uk-width-medium-1-[% results.columns %] uk-width-small-1-1 modules" id="fs_modules">
 	<div class="fs_heading">Modules</div>
 	[% FOREACH r IN results.modules %]
 	<div class="result_line" paws_link="module:[% r.title %]">
@@ -13,7 +13,7 @@
 [% END %]
 
 [% IF results.functions.size > 0 %]
-<div class="fs_section uk-width-medium-1-3 uk-width-small-1-1 functions" id="fs_functions">
+<div class="fs_section uk-width-medium-1-[% results.columns %] uk-width-small-1-1 functions" id="fs_functions">
 	<div class="fs_heading">Functions</div>
 	[% FOREACH r IN results.functions %]
 	<div class="result_line" paws_link="function:[% r.parent_module %]::[% r.title %]">
@@ -27,7 +27,7 @@
 [% END %]
 
 [% IF results.annotations.size > 0 %]
-<div class="fs_section annotations uk-width-medium-1-3 uk-width-small-1-1 " id="fs_annotations">
+<div class="fs_section annotations uk-width-medium-1-[% results.columns %] uk-width-small-1-1 " id="fs_annotations">
 	<div class="fs_heading">Annotations</div>
 	[% FOREACH r IN results.annotations %]
 	<div class="result_line" paws_link="module:[% r.module %]">

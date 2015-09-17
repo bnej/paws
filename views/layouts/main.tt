@@ -43,8 +43,7 @@
 		<div class="uk-container uk-container-center">
 			<a href="" data-uk-tooltip="{pos:'bottom'}" title="You know, for POD" class="uk-navbar-brand"><i class="uk-icon-paw"></i> PAWS</a>
 			<ul class="uk-navbar-nav">
-				<li class="uk-active">
-					<a href="#">Perldoc Browser</a>
+				<li><a data-uk-offcanvas="{target:'#open-documents'}"><i class="uk-icon-folder-open"></i> Documents</a>
 				</li>
 			</ul>
 		</div>

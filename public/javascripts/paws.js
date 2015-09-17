@@ -164,7 +164,7 @@ function display_document(name) {
             recents[name] = 1;
             current_document = name;
             var el = update_recents(name);
-            el.addClass('uk-button-success');
+            el.addClass('uk-active');
             el.hide().fadeIn(500);
             $.ajax({
                 url: "/menu", type: "get", dataType: "html",
@@ -290,9 +290,9 @@ function update_recents(name) { // returns the element created for "name" if pos
             var label = match[2];
             var doctype = match[1];
         
-            var li = $("<li class='uk-button'></li>");
-            var a = $("<a class='' href='#'>"+label+"</a>"); a.attr("onClick","display_document('"+k+"')" );
-            var x = $("<a href='#' class='close'>&times;</a>"); x.attr( 'onClick', "kill_recent('"+k+"')");
+            var li = $("<li></li>");
+            var a = $("<a href='#'>"+label+"</a>"); a.attr("onClick","display_document('"+k+"')" );
+            var x = $("<a href='#' style='float:right; clear: right;' class='uk-close'></a>"); x.attr( 'onClick', "kill_recent('"+k+"')");
         
             li.append(x);
             li.append(a);

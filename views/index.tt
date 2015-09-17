@@ -1,4 +1,4 @@
-<div class="uk-width-medium-1-4 uk-hidden-small uk-grid-small">
+	<div class="uk-width-medium-1-4 uk-hidden-small uk-grid-small">
 		<div class="uk-panel">
 			<form class="uk-form" onSubmit="return false;" accept-charset="utf-8">
 		
@@ -32,12 +32,15 @@
 		</div>
 	</div>
 	<div class="uk-width-medium-3-4 uk-width-small-1-1">
-		<div class="uk-panel-box uk-panel">
-			<ul id="recent_searches">
-				
-			</ul>
-		</div>
 		<div id="pod_content" class="pod_content">
 			
 		</div>
+	</div>
+
+	<div id="open-documents" class="uk-offcanvas">
+	    <div class="uk-offcanvas-bar">
+	        <ul class="uk-nav uk-nav-offcanvas" id="recent_searches" data-uk-nav>
+	        	
+	        </ul>
+	    </div>
 	</div>

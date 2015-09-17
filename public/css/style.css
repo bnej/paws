@@ -150,18 +150,6 @@ div.links h3 {
     font-size: 12px;
 }
 
-ul#recent_searches, ul.doc_links {
-    margin: 0; padding: 0;
-}
-
-ul#recent_searches li, ul.doc_links li {
-    margin: 0 2px;
-    list-style: none;
-    padding-right: 40px;
-    display: block;
-    float: left;
-}
-
 ul.doc_links li {
     max-width: 196px;
     overflow: hidden;
@@ -175,29 +163,6 @@ ul.doc_links li:hover {
 
 ul.doc_links li {
     padding-right: 5px;
-}
-
-ul#recent_searches li a {
-    float: left;
-}
-
-ul#recent_searches li a.close {
-    background-color: #444;
-    display: block;
-    float: right;
-    clear: right;
-    color: #F55;
-    margin-top: 6px;
-    width: 15px;
-    font-size: 10px;
-    font-weight: bold;
-    height: 15px;
-    line-height: 15px;
-    border-radius: 3px;
-    text-align: center;
-    text-decoration: none;
-    position:relative;
-    right: -35px;
 }
 
 a {

@@ -58,6 +58,7 @@ sub summarise_headings {
         }
         my $hdg_text = $hdg->text;
         my $item = node->item($hdg_text);
+        $item->param('original_serial',$head->serial); # Keep for contents linking
         if($hdg_text =~ m/^[0-9a-zA-Z_ ]+$/) {
             my ($synopsis) = $head->select("//:verbatim[. =~ {$hdg_text}](0)");
             if($synopsis) {

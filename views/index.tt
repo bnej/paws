@@ -19,18 +19,31 @@
 					       onchange="refresh_document()"/>
 				</fieldset>
 			</form>
-			<div id="menu">
-			</div>
 			
-			<ul class="uk-nav uk-nav-side" id="doc_links">
+		</div>
+
+		<div id="menu" class="uk-panel uk-panel-box">
+			
+		</div>
+
+		<div class="uk-panel uk-panel-box">
+			<ul class="uk-nav uk-nav-side">
 				<li class="uk-nav-header">Document Links</li>
 			</ul>
-
-			<ul class="uk-nav uk-nav-side" id="inbound_links">
-				<li class="uk-nav-header">Inbound Links</li>
+			<ul class="uk-nav uk-nav-side" id="doc_links">
 			</ul>
 		</div>
+
+		<div class="uk-panel uk-panel-box">
+			<ul class="uk-nav uk-nav-side">
+				<li class="uk-nav-header">Inbound Links</li>
+			</ul>
+			<ul class="uk-nav uk-nav-side" id="inbound_links">
+			</ul>
+		</div>
+
 	</div>
+	
 	<div class="uk-width-medium-3-4 uk-width-small-1-1">
 		<div id="pod_content" class="pod_content">
 			

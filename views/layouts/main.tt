@@ -18,11 +18,12 @@
 <script src="[% request.uri_base %]/javascripts/paws.js" type="text/javascript"></script>
 <script src="[% request.uri_base %]/js/uikit.min.js" type="text/javascript"></script>
 <script src="[% request.uri_base %]/js/components/search.min.js" type="text/javascript"></script>
+<script src="[% request.uri_base %]/js/components/accordion.min.js" type="text/javascript"></script>
 <script src="[% request.uri_base %]/javascripts/highlight.pack.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 
 </head>
-<body>
+<body data-uk-observe="">
 	<nav class="uk-navbar uk-navbar-attached">
 		<div class="uk-navbar-flip">
 	        <div class="uk-navbar-content">

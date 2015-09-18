@@ -17,24 +17,24 @@
 [% END %]
 
 [% BLOCK tt_head1 %]
-  <h2>[% INCLUDE annotate_link.tt %]<a name="[% p_node.param('heading').text %]"></a>[% INCLUDE pod_tt pod=p_node.param('heading') %]</h2>
+  <h2>[% INCLUDE annotate_link.tt %]<a name="[% p_node.serial %]"></a>[% INCLUDE pod_tt pod=p_node.param('heading') %]</h2>
   [% INCLUDE pod_tt pod=p_node %]
 [% END %]
 
 [% BLOCK tt_head2 %]
   [%# INCLUDE annotate_link.tt node=p_node %]
-  <h3>[% INCLUDE annotate_link.tt %]<a name="[% p_node.param('heading').text %]"></a>[% INCLUDE pod_tt pod=p_node.param('heading') %]</h3>
+  <h3>[% INCLUDE annotate_link.tt %]<a name="[% p_node.serial %]"></a>[% INCLUDE pod_tt pod=p_node.param('heading') %]</h3>
   [% INCLUDE pod_tt pod=p_node %]
 [% END %]
 
 [% BLOCK tt_head3 %]
 [% head_chain.push(p_node.param('heading').text) %]
-  <h4>[% INCLUDE annotate_link.tt %]<a name="[% p_node.param('heading').text %]"></a>[% INCLUDE pod_tt pod=p_node.param('heading') %]</h4>
+  <h4>[% INCLUDE annotate_link.tt %]<a name="[% p_node.serial %]"></a>[% INCLUDE pod_tt pod=p_node.param('heading') %]</h4>
   [% INCLUDE pod_tt pod=p_node %]
 [% END %]
 
 [% BLOCK tt_head4 %]
-  <h5>[% INCLUDE annotate_link.tt %]<a name="[% p_node.param('heading').text %]"></a>[% INCLUDE pod_tt pod=p_node.param('heading') %]</h5>
+  <h5>[% INCLUDE annotate_link.tt %]<a name="[% p_node.serial %]"></a>[% INCLUDE pod_tt pod=p_node.param('heading') %]</h5>
   [% INCLUDE pod_tt pod=p_node %]
 [% END %]
 

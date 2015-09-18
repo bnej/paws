@@ -227,25 +227,29 @@ any '/load' => sub {
         my $anno = load_annotations($name);
         merge_annotations($pa, $anno);
     }
-    
-    template "display_module.tt", 
+
+    my $content = template "display_module.tt", 
         { title => $name, sub => $subtitle, pa => $pa }, 
         {layout => undef};
-};
-
-any '/menu' => sub {
-    my $terms = params->{key};
     
-    my $pa = load_pa $terms;
-
-    my ($name, $subtitle) = extract_title $pa;
-
     my $summ = PodSummary->new->filter($pa);
     $_->detach foreach $summ->select('/head1[@heading eq \'NAME\']');
+    my $menu = template "display_menu.tt", 
+            { title => $name, sub => $subtitle, pa => $summ }, 
+            {layout => undef};
+
+    my @links = PAWS::Indexer->links($pa);
+
+    my $links = template "links.tt", 
+        { links => \@links }, 
+        { layout => undef };
     
-    template "display_menu.tt", 
-        { title => $name, sub => $subtitle, pa => $summ }, 
-        {layout => undef};
+    return {
+        content => $content,
+        menu => $menu,
+        links => $links,
+        inbound_links => inbound_links($doctype, $id)
+    };
 };
 
 any '/complete' => sub {
@@ -317,8 +321,8 @@ any '/complete' => sub {
         { layout => undef };
 };
 
-any '/inbound_links' => sub {
-    my ($doctype,$original_doc) = split_key params->{key};
+sub inbound_links {
+    my ($doctype,$original_doc) = @_;
     
     my $e = elastic();
     my $results = $e->search(
@@ -340,22 +344,10 @@ any '/inbound_links' => sub {
         
     my @out_links = map { node->link($_->{_source}{title}) } @{$results->{hits}{hits}};
     
-    template "links.tt",
+    return template "links.tt",
         {links => \@out_links},
         {layout => undef};
-};
-
-any '/links' => sub {
-    my ($doctype,$module) = split_key params->{key};
-    
-    my $pa = load_pa params->{key};
-    
-    my @links = PAWS::Indexer->links($pa);
-    
-    template "links.tt", 
-        { links => \@links }, 
-        { layout => undef };
-};
+}
 
 get qr{.*} => sub {
     set layout => 'uikit_doc.tt';

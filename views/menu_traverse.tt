@@ -1,3 +1,5 @@
+[% DEFAULT depth=0 %]
+
 [% INCLUDE pod_tt pod=pod %]
 
 [% BLOCK pod_tt %]
@@ -7,7 +9,7 @@
 	   tt_name = tt_name.replace("#","_");
 	   SET tt_name = "tt_" _ tt_name; %]
 	
-	[% INCLUDE $tt_name p_node=node %]
+	[% INCLUDE $tt_name p_node=node depth=depth %]
 	
   [% END %]
 [% END %]
@@ -25,11 +27,20 @@
 [% END %]
 
 [% BLOCK tt_over %]
-	<ul>[% INCLUDE pod_tt pod=p_node %]</ul>
+	<ul class="[% IF depth > 0 %] uk-nav-sub[% ELSE %]uk-nav-side uk-nav uk-nav-parent-icon[% END %]" [% IF depth == 0 %]data-uk-nav=""[% END %]>[% depth=depth + 1 %]
+		[% INCLUDE pod_tt pod=p_node %]
+	</ul>
 [% END %]
 
 [% BLOCK tt_item %]
-  <li><a href="#[% p_node.param('label').text %]">[% INCLUDE pod_tt pod=p_node.param('label') %]</a>
+  [% SET li_class="" %]
+  [% SET parent=0 %]
+  [% IF p_node.select('/over') %]
+    [% SET li_class="uk-parent" %]
+    [% SET parent = 1 %]
+  [% END %]
+  <li class="[% li_class %]">
+	<a [% IF parent %]href="#"[% ELSE %]href="#[% p_node.param('original_serial') %]"[% END %]>[% INCLUDE pod_tt pod=p_node.param('label') %]</a>
 	  [% INCLUDE pod_tt pod=p_node %]
 	</li>
 [% END %]

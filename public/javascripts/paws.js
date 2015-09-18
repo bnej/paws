@@ -157,30 +157,18 @@ function display_document(name) {
     new $.ajax({
         url: '/load',
         type: "get",
-        dataType: "html",
+        dataType: "json",
         data: { paws_key: name, overlay: f_overlay, sort: f_sort, view: f_view },
         success: function(response){
-            $('#pod_content').html(response);
+            $('#pod_content').html(response.content);
+            $('#menu').html(response.menu);
+            $('#doc_links').html(response.links);
+            $('#inbound_links').html(response.inbound_links);
             recents[name] = 1;
             current_document = name;
             var el = update_recents(name);
             el.addClass('uk-active');
             el.hide().fadeIn(500);
-            $.ajax({
-                url: "/menu", type: "get", dataType: "html",
-                data: {key: name},
-                success: function(r){ $('#menu').html(r) }
-            });
-            $.ajax({
-                url: "/links", type: "get", dataType: "html",
-                data: {key: name},
-                success: function(r){ $('#links').html(r) }
-            });
-            $.ajax({
-                url: "/inbound_links", type: "get", dataType: "html",
-                data: {key: name},
-                success: function(r){ $('#inbound_links').html(r) }
-            });
 
             /* Trigger highlight.js */
             $("pre code").each(function() {

@@ -1,3 +1,4 @@
-<ul class="menu">
-[% INCLUDE menu_traverse.tt pod = pa %]
+<ul class="uk-nav uk-nav-side">
+	<li class="uk-nav-header">Contents</li>
 </ul>
+[% INCLUDE menu_traverse.tt pod = pa %]

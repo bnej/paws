@@ -36,7 +36,7 @@
 					</div>
 				<script>
 				new PAWS_FastSearch(
-					'terms','/complete'
+					'terms','/_complete'
 					);
 				</script>
 			</div>
@@ -53,7 +53,7 @@
 
 	<div class="uk-container uk-container-center">
 <div class="uk-grid page_wrapper">
-[% content %]
+	[% content %]
 </div>
 <div id="edit_overlay" class="edit_overlay popover">
 </div>

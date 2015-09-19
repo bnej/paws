@@ -47,9 +47,9 @@ sub split_key($) {
     return split ':',$term,2;
 }
 
-sub load_pa($) {
-    my $term = shift;
-    my ($doctype, $id) = split_key $term;
+sub load_pa($$) {
+    my $doctype = shift;
+    my $id = shift;
     
     my $e = elastic;
     
@@ -67,7 +67,7 @@ sub load_pa($) {
     if($doc->{found}) {
         return Pod::Abstract->load_string($doc->{_source}{pod});
     } else {
-        return Pod::Abstract->load_string(error_doc($term));
+        return Pod::Abstract->load_string(error_doc($id));
     }
 }
 
@@ -150,10 +150,27 @@ sub extract_title($) {
 
 get '/' => sub {
     set layout => 'main.tt';
-    template 'index';
+    
+    my $key = 'index';
+    my $view = 'normal';
+
+    my $r = load_key_view($key, $view);
+    
+    template 'index', $r;
 };
 
-post '/edit_annotation' => sub {
+get qr{/([^\_][^/]*)(?:/([^/]*))?} => sub {
+    set layout => 'main.tt';
+    my ($key, $view) = splat;
+    $view = 'normal' unless $view;
+    
+    my $r = load_key_view($key, $view);
+    
+    template 'index', $r;
+};
+
+
+post '/_edit_annotation' => sub {
     my $module = params->{module};
     my $node_path = params->{node_path};
     
@@ -164,7 +181,7 @@ post '/edit_annotation' => sub {
         { layout => undef };
 };
 
-post "/save_annotation" => sub {
+post "/_save_annotation" => sub {
     my $module = params->{module};
     my $node_path = params->{node_path};
 
@@ -190,16 +207,19 @@ post "/save_annotation" => sub {
     return { saved => 'yes' };
 };
 
-get "/js_poke" => sub {
-    return { im_json => 'yes', im_batman => 'no' };
-};
-
-any '/load' => sub {
+any '/_load' => sub {
     header('Cache-Control' =>  'no-store, no-cache, must-revalidate');
     my $key = params->{paws_key};
     my $view = params->{view};
+
+    return load_key_view($key, $view)
+};
+
+sub load_key_view {
+    my $key = shift;
+    my $view = shift;
     
-    my $pa = load_pa $key;
+    my $pa = load_pa 'module',$key;
     
     my ($name, $subtitle) = extract_title $pa;
 
@@ -220,13 +240,10 @@ any '/load' => sub {
     if(params->{sort}) {
         $pa = Pod::Abstract::Filter::sort->new->filter($pa);
     }
-    my ($doctype,$id) = split_key $key;
-    $name = $id unless $name;
+    $name = $key unless $name;
 
-    if($doctype eq 'module') {
-        my $anno = load_annotations($name);
-        merge_annotations($pa, $anno);
-    }
+    my $anno = load_annotations($name);
+    merge_annotations($pa, $anno);
 
     my $content = template "display_module.tt", 
         { title => $name, sub => $subtitle, pa => $pa }, 
@@ -245,14 +262,15 @@ any '/load' => sub {
         { layout => undef };
     
     return {
+        active_document => $key,
         content => $content,
         menu => $menu,
         links => $links,
-        inbound_links => inbound_links($doctype, $id)
+        inbound_links => inbound_links($key)
     };
-};
+}
 
-any '/complete' => sub {
+any '/_complete' => sub {
     my $terms = params->{terms};
     
     my $e = elastic();
@@ -322,7 +340,7 @@ any '/complete' => sub {
 };
 
 sub inbound_links {
-    my ($doctype,$original_doc) = @_;
+    my ($original_doc) = @_;
     
     my $e = elastic();
     my $results = $e->search(
@@ -348,20 +366,5 @@ sub inbound_links {
         {links => \@out_links},
         {layout => undef};
 }
-
-get qr{.*} => sub {
-    set layout => 'uikit_doc.tt';
-    my $path = request->path;
-    
-    my $pa;
-    if(-e "pod_public/$path") {
-        $pa = Pod::Abstract->load_file("pod_public/$path");
-    } else {
-        status 'not_found';
-        $pa = Pod::Abstract->load_string(error_doc($path));
-    }
-    
-    template "perldoc.tt", { pa => $pa };
-};
 
 true;

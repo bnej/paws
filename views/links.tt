@@ -7,7 +7,7 @@
 		[% IF l.document %]
 			<a href="#"
 				onClick="
-				display_document('module:[% l.document %]');
+				display_document('[% l.document %]');
 				return true;
 				">
 				[% l.text %]

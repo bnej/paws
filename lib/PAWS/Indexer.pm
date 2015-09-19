@@ -37,7 +37,8 @@ sub index_file {
 
     my @func_indexed = $class->index_functions($pa, $time_string, $e);
 
-    my @head2 = map { $_->text }  $pa->select('//head2@heading');
+    my @head1 = map { $_->text } $pa->select('//head1@heading');
+    my @head2 = map { $_->text } $pa->select('//head2@heading');
 
     $e->index(
         index => 'perldoc',
@@ -47,6 +48,7 @@ sub index_file {
         	title => $title,
         	shortdesc => $shortdesc,
         	pod => $pa->pod,
+        	head1 => [ @head1 ],
         	head2 => [ @head2 ],
         	links_to => [ map { $_->text } $class->links($pa) ],
         	dirs => [ @dirs ],
@@ -54,48 +56,7 @@ sub index_file {
         }
         );
     
-    return (scalar(@func_indexed) + 1)
-}
-
-sub index_functions {
-    my $class = shift;
-    my $pa = shift;
-    my $time_string = shift;
-    my $e = shift;
-    
-    my ($title, $shortdesc) = PAWS::extract_title($pa);
-    my @func_h2 = $pa->select('/head1[@heading =~ {METHODS|FUNCTIONS}]/head2');
-
-    foreach my $f (@func_h2) {
-        my $fname = $f->param('heading')->text;
-        my $short = '';
-        if($fname =~ m/^[0-9a-zA-Z_ ]+$/) {
-            my ($in_cut) = $f->select("//#cut[. =~ {$fname}](0)");
-            my ($synopsis) = $f->select("//:verbatim[. =~ {$fname}](0)");
-            if($synopsis) {
-                $short = $synopsis->pod;
-            }
-        
-            # If it doesn't appear in the cut nodes below, and doesn't have a
-            # synopsis, skip it.
-            next unless $in_cut || $synopsis;
-        }
-
-        $e->index(
-            index => 'perldoc',
-            type => 'function',
-            id => $title . '::' . $fname,
-            body => {
-                pod => $f->pod,
-                title => $fname,
-                parent_module => $title,
-                shortdesc => $short,
-            	date => $time_string,
-        	},
-            );
-    }
-    
-    return @func_h2;
+    return (1)
 }
 
 sub links {
@@ -118,6 +79,17 @@ sub links {
     }
     my @links = map { $links{$_} } sort keys %links;
     return @links;
+}
+
+sub nav_groups {
+    my $class = shift;
+    my $pa = shift;
+    
+    my @for_groups = $pa->select("//for[. =~ {^groups}]");
+    
+    my @groups = map { split /\s/, $_ } map { $_ =~ m/groups (.*$)/; $1 } @for_groups;
+    
+    return @groups;
 }
 
 1;

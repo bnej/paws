@@ -155,7 +155,7 @@ function display_document(name) {
     var f_sort = $('#sort:checked').val();
     
     new $.ajax({
-        url: '/load',
+        url: '/_load',
         type: "get",
         dataType: "json",
         data: { paws_key: name, overlay: f_overlay, sort: f_sort, view: f_view },
@@ -210,7 +210,7 @@ function edit_annotation(event) {
     ed.addClass("on");
     
     new $.ajax({
-        url: "/edit_annotation",
+        url: "/_edit_annotation",
         type: "post",
         dataType: "html",
         data: params,
@@ -235,14 +235,14 @@ function save_annotation(ev) {
     ed.innerHTML = '<div class="loader" />'
     
     new $.ajax({
-        url: "/save_annotation",
+        url: "/_save_annotation",
         type: "post",
         dataType: "json",
         data: params,
         success: function(response) {
             if(response.saved == 'yes') {
                 overlay_off();
-                var f = function() { display_document('module:' + module_name) };
+                var f = function() { display_document(module_name) };
                 _.delay(f,1000);
             }
         }
@@ -253,42 +253,42 @@ function save_annotation(ev) {
 
 function load_recents() {
     var d = $.getQuery('d');
-    var c = $.getQuery('c');
     
-    if(!(d || c))
+    if(!d)
         return;
     var all = d.split(",");
     _.each(all,function(x) { recents[x] = 1; });
-    display_document(c);
+//    display_document(c);
 }
 
 function update_recents(name) { // returns the element created for "name" if possible
     var out = null;
-    $(recent_searches).children().each(function() { this.remove() });
+    var count_recents = _.keys(recents).length;
+    $('#recent_searches').children().each(function() { this.remove() });
+    var slug = "/" + current_document;
+    if(count_recents > 1) {
+        slug += "?d=" + _.keys(recents).sort().join(",");
+    }
+    
     history.pushState( {
       old_text: "PAWS",
       new_text: "PAWS",
-      slug: ("?d=" + _.keys(recents).sort().join(",") + "&c=" + current_document)
-    }, null, ("?d=" + _.keys(recents).sort().join(",")) + "&c=" + current_document);
+      slug: slug
+    }, null, slug);
     
     _.each(_.keys(recents).sort(), function(k) {
-        var pm = /^([a-z]+):(.*)$/;
-        var match = pm.exec(k);
-        if(match){
-            var label = match[2];
-            var doctype = match[1];
-        
-            var li = $("<li></li>");
-            var a = $("<a href='#'>"+label+"</a>"); a.attr("onClick","display_document('"+k+"')" );
-            var x = $("<a href='#' style='float:right; clear: right;' class='uk-close'></a>"); x.attr( 'onClick', "kill_recent('"+k+"')");
-        
-            li.append(x);
-            li.append(a);
+        var label = k;
+    
+        var li = $("<li></li>");
+        var a = $("<a href='#'>"+label+"</a>"); a.attr("onClick","display_document('"+k+"')" );
+        var x = $("<a href='#' style='float:right; clear: right;' class='uk-close'></a>"); x.attr( 'onClick', "kill_recent('"+k+"')");
+    
+        li.append(x);
+        li.append(a);
 
-            $(recent_searches).append(li);
-            if(name == k) {
-                out = li;
-            }
+        $('#recent_searches').append(li);
+        if(name == k) {
+            out = li;
         }
     });
     return out;
@@ -464,7 +464,6 @@ var PAWS_FastSearch = Class.extend({
                 div.attr("class","uk-grid uk-grid-small");
                 div.addClass("uk-width-medium-"+section_count+"-4");
                 div.addClass("uk-width-small-1-1");
-//                div.css('width', '' + (300 * section_count) + 'px')
                 div.css('position', 'absolute')
                 obj.ajax_active = false;
                 obj.selected_elt = null;

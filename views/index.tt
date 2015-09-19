@@ -1,3 +1,4 @@
+
 	<div class="uk-width-medium-1-4 uk-hidden-small uk-grid-small">
 		<div class="uk-panel">
 			<form class="uk-form" onSubmit="return false;" accept-charset="utf-8">
@@ -23,7 +24,7 @@
 		</div>
 
 		<div id="menu" class="uk-panel uk-panel-box">
-			
+			[% menu %]
 		</div>
 
 		<div class="uk-panel uk-panel-box">
@@ -31,6 +32,7 @@
 				<li class="uk-nav-header">Document Links</li>
 			</ul>
 			<ul class="uk-nav uk-nav-side" id="doc_links">
+				[% links %]
 			</ul>
 		</div>
 
@@ -39,6 +41,7 @@
 				<li class="uk-nav-header">Inbound Links</li>
 			</ul>
 			<ul class="uk-nav uk-nav-side" id="inbound_links">
+				[% inbound_links %]
 			</ul>
 		</div>
 
@@ -46,7 +49,7 @@
 	
 	<div class="uk-width-medium-3-4 uk-width-small-1-1">
 		<div id="pod_content" class="pod_content">
-			
+			[% content %]
 		</div>
 	</div>
 
@@ -57,3 +60,13 @@
 	        </ul>
 	    </div>
 	</div>
+
+[% IF active_document %]
+<script>
+/* Set one open document on init if we're loading from previous state */
+recents['[% active_document %]'] = 1;
+current_document = '[% active_document %]';
+var el = update_recents('[% active_document %]');
+el.addClass('uk-active');
+</script>
+[% END %]

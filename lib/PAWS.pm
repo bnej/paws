@@ -139,7 +139,16 @@ sub merge_annotations {
 sub extract_title($) {
     my $pa = shift;
     my ($name_para) = $pa->select("/head1[\@heading =~ {^NAME}]/:paragraph");
-    if($name_para) {
+    my ($title_exact) = $pa->select("//for[. =~ {^title }]");
+    
+    if($title_exact) {
+        my $body = $title_exact->body;
+        $body =~ s/^title //;
+        my ($title, $sub) = split /\s+-+\s+/, $body;
+        
+        return ($title, $sub) if $sub;
+        return $body;
+    }elsif($name_para) {
         my $name = $name_para->text;
 
         my ($title, $sub) = split /\s+-+\s+/, $name;
@@ -305,7 +314,6 @@ sub load_key_view {
             foreach my $ixe (@ix) {
                 my $it = $ixe->text;
 
-                warning("$it eq $section");
                 if($it eq $section) {
                     $section_target = $ixe->serial;
                     last;

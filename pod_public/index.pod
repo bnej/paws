@@ -1,3 +1,25 @@
-=head1 I am a perldoc
+=head1 Welcome to PAWS
 
-woo!
+=for title index - Welcome to PAWS
+
+PAWS is your Pod Abstract Web Service - a searchable, discoverable,
+traversable index of documents covering your codebase and beyond.
+
+This is the default index page, you can replace this by indexing any other
+document called "index".
+
+Try starting here:
+
+=over
+
+=item Perl Builtin Docs:
+
+L<perlfunc>, L<perlvar>, L<perlbook> - These should all be searchable if
+you've indexed your builtin perldoc.
+
+=item Pod::Abstract docs:
+
+L<Pod::Abstract>, L<Pod::Abstract::Node>, L<Pod::Abstract::Path> - Learn
+to extend and improve.
+
+=back

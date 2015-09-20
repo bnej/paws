@@ -259,7 +259,6 @@ function load_recents() {
         return;
     var all = d.split(",");
     _.each(all,function(x) { recents[x] = 1; });
-//    display_document(c);
 }
 
 function set_url_state() {

@@ -162,13 +162,16 @@ function display_document(name,section) {
             current_section = '';
             var el = update_recents(name);
             el.addClass('uk-active');
-            el.hide().fadeIn(500);
 
             /* Trigger highlight.js */
             $("pre code").each(function() {
                 hljs.highlightBlock(this);
             });
             attach_listeners();
+            
+            if(response.section_target) {
+                paws_go(response.section_name, response.section_target);
+            }
         }
     });
 }

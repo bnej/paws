@@ -219,8 +219,9 @@ any '/_load' => sub {
     header('Cache-Control' =>  'no-store, no-cache, must-revalidate');
     my $key = params->{paws_key};
     my $view = params->{view};
+    my $section = params->{section};
 
-    return load_key_view($key, $view)
+    return load_key_view($key, $view, $section);
 };
 
 sub load_key_view {

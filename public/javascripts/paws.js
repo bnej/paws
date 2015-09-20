@@ -143,8 +143,8 @@ function refresh_document() {
 
 function paws_go_delay(section_name, section_target, try_n) {
     try_n = try_n || 1;
-    if($('#'+section_target).length > 0) {
-        paws_go(response.section_name, response.section_target);
+    if($('#sa_'+section_target).length > 0) {
+        paws_go(section_name, section_target);
     } else {
         if(try_n > 5) return;
         
@@ -161,6 +161,7 @@ function display_document(name,section) {
     var f_sort = $('#sort:checked').val();
     section = section || '';
     
+    loading_on();
     new $.ajax({
         url: '/_load',
         type: "get",
@@ -186,7 +187,8 @@ function display_document(name,section) {
             var section_name = response.section_name;
             var section_target = response.section_target;
             
-            if(response.section_target) {
+            loading_off();
+            if(section_target) {
                 window.setTimeout(function() {
                     paws_go_delay(section_name, section_target, 1);
                 }, 200);
@@ -206,6 +208,19 @@ function attach_listeners() {
     $('button.annotate_button').each(function(elt) {
         $(this).on("click",edit_annotation);
     });
+}
+
+function loading_on() {
+    var overlay = $('#load_overlay');
+    overlay.addClass('on');
+    
+    return false;
+}
+
+function loading_off() {
+    $('.popover').removeClass('on');
+    
+    return false;
 }
 
 function overlay_on() {

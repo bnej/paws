@@ -57,6 +57,11 @@
 </div>
 <div id="edit_overlay" class="edit_overlay popover">
 </div>
+<div id="load_overlay" class="edit_overlay popover">
+	<div class="load_icon_wrapper">
+		<i class="uk-icon-paw uk-icon-large uk-icon-spin"></i>
+	</div>
+</div>
 <div id="annotate_edit" class="annotate_edit popover" />
 </div>
 </div>

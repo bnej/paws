@@ -145,6 +145,19 @@ code, tt {
     font-style: italic;
 }
 
+div.load_icon_wrapper {
+    position:fixed;
+    top: 50%;
+    left: 50%;
+    margin-left: -92px;
+    margin-top: -100px;
+}
+
+div.load_icon_wrapper .uk-icon-large:before {
+    font-size: 200px;
+    color: white;
+}
+
 div.annotate_edit {
     position:fixed;
     z-index: 50;

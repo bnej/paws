@@ -82,7 +82,7 @@
 				display_document('[% l.document %]','[% l.section %]');
 				return true;
 				">
-				[% l.text %][% IF l.section %] [% l.section %][% END %]</a>
+				[% IF l.section %][% l.section %] in [% END %][% l.text %]</a>
 		[% ELSE %]
 			<a href="#[% l.section %]">[% l.text %]</a>
 		[% END %]

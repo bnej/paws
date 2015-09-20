@@ -14,6 +14,8 @@ use Pod::Abstract::BuildNode qw(node);
 use Digest::MD5 qw(md5_hex);
 use Search::Elasticsearch;
 
+use Data::Dumper;
+
 our $VERSION = '0.1';
 
 sub error_doc {
@@ -330,61 +332,39 @@ any '/_complete' => sub {
     my $e = elastic();
     my $results = $e->search(
         index => 'perldoc',
-        type => 'module',
-        _source => [ "title","shortdesc" ],
+        type => ['module','annotation'],
+        _source => [ "title","shortdesc","pod","module" ],
         body => {
             query => {
                 multi_match => {
                     query => $terms,
-                    fields => ["title^4", "shortdesc^2","head2^2", "pod"]
+                    fields => ["title^4","index_entries^5","shortdesc^2","head2^2", "module", "pod"]
                 }
+            },
+            "highlight"=> {
+              "fields"=> {
+                "title"=> {},
+                "index_entries"=> {},
+                "shortdesc"=> {},
+                "head2"=> {}
+              }
             }
         }
         );
     
-    my $out_mod = [ map { $_->{_source} } @{$results->{hits}{hits}} ];
+    my $out_mod = $results->{hits}{hits};
 
-    $results = $e->search(
-        index => 'perldoc',
-        type => 'function',
-        _source => [ "title","shortdesc","parent_module" ],
-        body => {
-            query => {
-                multi_match => {
-                    query => $terms,
-                    fields => ["title^4", "shortdesc^2","pod"]
-                }
-            }
+    foreach my $oa (@$out_mod) {
+        if($oa->{_type} eq 'annotation') {
+            $oa->{_source}{pa} = Pod::Abstract->load_string("=pod\n\n".$oa->{_source}{pod});
         }
-        );
-    my $out_fn = [ map { $_->{_source} } @{$results->{hits}{hits}} ];
-
-    $results = $e->search(
-        index => 'perldoc',
-        type => 'annotation',
-        _source => [ "module","pod" ],
-        body => {
-            query => {
-                multi_match => {
-                    query => $terms,
-                    fields => ["pod"]
-                }
-            }
-        }
-        );
-    my $out_anno = [ map { $_->{_source} } @{$results->{hits}{hits}} ];
-    foreach my $oa (@$out_anno) {
-        $oa->{pa} = Pod::Abstract->load_string("=pod\n\n".$oa->{pod});
     }
+    
     my $columns = 0;
-    $columns += 1 if @$out_anno > 0;
-    $columns += 1 if @$out_fn > 0;
     $columns += 1 if @$out_mod > 0;
     
     my $out = {
-        functions => $out_fn,
         modules => $out_mod,
-        annotations => $out_anno,
         columns => $columns
     };
     

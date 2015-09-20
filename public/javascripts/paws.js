@@ -335,7 +335,7 @@ function update_recents(name) { // returns the element created for "name" if pos
     
         var li = $("<li></li>");
         var a = $("<a href='#'>"+label+"</a>"); a.attr("onClick","display_document('"+k+"')" );
-        var x = $("<a href='#' style='float:right; clear: right;' class='uk-close'></a>"); x.attr( 'onClick', "kill_recent('"+k+"')");
+        var x = $("<a href='#' style='float:right; clear: right;' class='uk-close'></a>"); x.attr( 'onClick', "kill_recent('"+k+"'); return false;");
     
         li.append(x);
         li.append(a);
@@ -352,11 +352,8 @@ function update_recents(name) { // returns the element created for "name" if pos
 }
 
 function kill_recent(k) {
-    var el = update_recents(k);
-    el.fadeOut(500,function() {
-        delete recents[k];
-        update_recents();
-    });
+    delete recents[k];
+    update_recents();
 }
 
 var PAWS_FastSearch = Class.extend({
@@ -494,16 +491,19 @@ var PAWS_FastSearch = Class.extend({
 
         if(ev.which == KEY_RETURN) {
             if(this.keynav && this.selected_elt) {
-                var paws_link = $(this.selected_elt).attr('paws_link')
-                display_document(paws_link);
+                var paws_link = $(this.selected_elt).attr('paws_link');
+                var paws_section = $(this.selected_elt).attr('paws_section') || '';
+                display_document(paws_link, paws_section);
                 ev.stopPropagation();
             }
         }
 
     },
     fs_result_click: function(ev,elt) {
-        var paws_link = $(elt).attr('paws_link')
-        display_document(paws_link);
+        var paws_link = $(elt).attr('paws_link');
+        var paws_section = $(elt).attr('paws_section') || '';
+        
+        display_document(paws_link, paws_section);
     },
     fs_load: function() {
         var div = this.fs_div();
@@ -519,7 +519,7 @@ var PAWS_FastSearch = Class.extend({
                 
                 var section_count = response_divs.length;
                 div.attr("class","uk-grid uk-grid-small");
-                div.addClass("uk-width-medium-"+section_count+"-4");
+                div.addClass("uk-width-medium-2-4");
                 div.addClass("uk-width-small-1-1");
                 div.css('position', 'absolute')
                 obj.ajax_active = false;

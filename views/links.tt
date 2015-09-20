@@ -8,7 +8,7 @@
 			<a href="#"
 				onClick="
 				display_document('[% l.document %]');
-				return true;
+				return false;
 				">
 				[% l.text %]
 			</a>

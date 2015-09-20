@@ -94,7 +94,7 @@ sub index_entries {
     my $class = shift;
     my $pa = shift;
     
-    my @index = $pa->select("//:X");
+    my @index = $pa->select('//:X|//@heading/:X|//@label/:X');
     
     return map { $_->text } @index;
 }

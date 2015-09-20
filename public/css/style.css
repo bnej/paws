@@ -243,7 +243,20 @@ div.fs_heading {
 div.result_line {
     height: 40px;
     padding: 0 5px 0 5px;
-    margin-bottom: 5px;
+    margin-top: 5px;
+    margin-bottom: 3px;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+div.sub_result_line {
+    height: 15px;
+    line-height: 15px;
+    font-size: 0.8em;
+    padding: 0 5px 0 15px;
+    margin-top: 0;
+    margin-bottom: 0;
+    color: #888;
     cursor: pointer;
     overflow: hidden;
 }

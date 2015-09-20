@@ -192,9 +192,13 @@ function display_document(name,section) {
                 window.setTimeout(function() {
                     paws_go_delay(section_name, section_target, 1);
                 }, 200);
+            } else {
+                UIkit.Utils.scrollToElement(UIkit.$('#pod_content'));
             }
         }
     });
+    
+    return false;
 }
 
 function paws_go(section_name, section_id) {

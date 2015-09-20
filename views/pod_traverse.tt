@@ -80,11 +80,16 @@
 			<a href="#"
 				onClick="
 				display_document('[% l.document %]','[% l.section %]');
-				return true;
+				return false;
 				">
 				[% IF l.section %][% l.section %] in [% END %][% l.text %]</a>
 		[% ELSE %]
-			<a href="#[% l.section %]">[% l.text %]</a>
+			<a href="#"
+				onClick="
+				display_document(current_document,'[% l.section %]');
+				return false;
+				">
+			[% l.text %]</a>
 		[% END %]
 	[% END %]
 </span>

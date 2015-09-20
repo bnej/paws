@@ -186,6 +186,9 @@ get qr{/([^\_][^/]*)((?:/(?:[^/\@]*))?)((?:/\@(?:[^/]*))?)} => sub {
     template 'index', $r;
 };
 
+get '/_index' => sub {
+    
+};
 
 post '/_edit_annotation' => sub {
     my $module = params->{module};

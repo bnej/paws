@@ -159,12 +159,20 @@ get '/' => sub {
     template 'index', $r;
 };
 
-get qr{/([^\_][^/]*)(?:/([^/]*))?} => sub {
+get qr{/([^\_][^/]*)((?:/(?:[^/\@]*))?)((?:/\@(?:[^/]*))?)} => sub {
     set layout => 'main.tt';
-    my ($key, $view) = splat;
-    $view = 'normal' unless $view;
+    my ($key, $view, $target) = splat;
+    if($view) {
+        $view =~ s/^\///;
+    } else {
+        $view = 'normal';
+    }
     
-    my $r = load_key_view($key, $view);
+    if($target) {
+        $target =~ s/^\/\@//;
+    }
+    
+    my $r = load_key_view($key, $view, $target);
     
     template 'index', $r;
 };
@@ -218,6 +226,7 @@ any '/_load' => sub {
 sub load_key_view {
     my $key = shift;
     my $view = shift;
+    my $section = shift;
     
     my $pa = load_pa 'module',$key;
     
@@ -251,6 +260,7 @@ sub load_key_view {
     
     my $summ = PodSummary->new->filter($pa);
     $_->detach foreach $summ->select('/head1[@heading eq \'NAME\']');
+    
     my $menu = template "display_menu.tt", 
             { title => $name, sub => $subtitle, pa => $summ }, 
             {layout => undef};
@@ -261,12 +271,29 @@ sub load_key_view {
         { links => \@links }, 
         { layout => undef };
     
+    # Find a link target, if provided:
+    my $section_target = undef;
+    if($section) {
+        my @headings = $pa->select('//[@heading]');
+        foreach my $head(@headings) {
+            my ($hdg) = $head->select('@heading');
+            my $hdg_text = $hdg->text;
+            
+            if($hdg_text eq $section) {
+                $section_target = $head->serial;
+                last;
+            }
+        }
+    }    
+    
     return {
         active_document => $key,
         content => $content,
         menu => $menu,
         links => $links,
-        inbound_links => inbound_links($key)
+        inbound_links => inbound_links($key),
+        section_name => $section,
+        section_target => $section_target,
     };
 }
 

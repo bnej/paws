@@ -1,6 +1,7 @@
 
 var recents = { };
 var current_document;
+var current_section;
 
 var KEY_LEFT = 37;
 var KEY_UP = 38;
@@ -136,29 +137,21 @@ function getPreferredStyleSheet() {
   return null;
 }
 
-window.onload = function(e) {
-  var cookie = readCookie("style");
-  var title = cookie ? cookie : getPreferredStyleSheet();
-  setActiveStyleSheet(title);
-  load_recents();
-}
-
-
 function refresh_document() {
     display_document(current_document);
 }
 
-function display_document(name) {
-    
+function display_document(name,section) {
     var f_overlay = $('#overlay:checked').val();
     var f_view = $('#view').val();
     var f_sort = $('#sort:checked').val();
+    section = section || '';
     
     new $.ajax({
         url: '/_load',
         type: "get",
         dataType: "json",
-        data: { paws_key: name, overlay: f_overlay, sort: f_sort, view: f_view },
+        data: { paws_key: name, section: section, overlay: f_overlay, sort: f_sort, view: f_view },
         success: function(response){
             $('#pod_content').html(response.content);
             $('#menu').html(response.menu);
@@ -166,6 +159,7 @@ function display_document(name) {
             $('#inbound_links').html(response.inbound_links);
             recents[name] = 1;
             current_document = name;
+            current_section = '';
             var el = update_recents(name);
             el.addClass('uk-active');
             el.hide().fadeIn(500);
@@ -177,6 +171,13 @@ function display_document(name) {
             attach_listeners();
         }
     });
+}
+
+function paws_go(section_name, section_id) {
+    current_section = section_name;
+    UIkit.Utils.scrollToElement(UIkit.$('#sa_' + section_id));
+    set_url_state();
+    return false;
 }
 
 function attach_listeners() {
@@ -261,13 +262,21 @@ function load_recents() {
 //    display_document(c);
 }
 
-function update_recents(name) { // returns the element created for "name" if possible
-    var out = null;
+function set_url_state() {
     var count_recents = _.keys(recents).length;
-    $('#recent_searches').children().each(function() { this.remove() });
     var slug = "/" + current_document;
+    var f_view = $('#view').val();
+    
+    if(f_view != 'normal') {
+        slug += '/' + f_view;
+    }
+    
+    if(current_section) {
+        slug += "/@" + current_section;
+    }
+    
     if(count_recents > 1) {
-        slug += "?d=" + _.keys(recents).sort().join(",");
+        slug += "?d=" + _.without(_.keys(recents), current_document).sort().join(",");
     }
     
     history.pushState( {
@@ -275,6 +284,11 @@ function update_recents(name) { // returns the element created for "name" if pos
       new_text: "PAWS",
       slug: slug
     }, null, slug);
+}
+
+function update_recents(name) { // returns the element created for "name" if possible
+    var out = null;
+    $('#recent_searches').children().each(function() { this.remove() });
     
     _.each(_.keys(recents).sort(), function(k) {
         var label = k;
@@ -291,6 +305,9 @@ function update_recents(name) { // returns the element created for "name" if pos
             out = li;
         }
     });
+    
+    set_url_state();
+    
     return out;
 }
 

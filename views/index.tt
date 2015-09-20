@@ -61,12 +61,18 @@
 	    </div>
 	</div>
 
-[% IF active_document %]
 <script>
+$( function() {
+  load_recents();
 /* Set one open document on init if we're loading from previous state */
+[% IF active_document %]
 recents['[% active_document %]'] = 1;
 current_document = '[% active_document %]';
+[% IF section_target %]
+  paws_go('[% section_name %]','[% section_target %]');
+[% END %]
 var el = update_recents('[% active_document %]');
 el.addClass('uk-active');
-</script>
 [% END %]
+});
+</script>

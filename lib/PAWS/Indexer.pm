@@ -21,9 +21,6 @@ sub index_file {
     
     my ($basename,$path,$suffix) = fileparse($filename,'.pm','.pod','.pl');
     
-    my @dirs = grep { $_ && $_ !~ /^(lib|bin|doc)$/ } 
-        File::Spec->splitdir( $path . $basename );
-
     my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
                           $atime,$mtime,$ctime,$blksize,$blocks)
                           = stat($filename);
@@ -35,8 +32,7 @@ sub index_file {
 
     return 0 unless $title;
 
-    my @func_indexed = $class->index_functions($pa, $time_string, $e);
-
+    my @namespaces = split /::/,$title;
     my @head1 = map { $_->text } $pa->select('//head1@heading');
     my @head2 = map { $_->text } $pa->select('//head2@heading');
 
@@ -51,8 +47,10 @@ sub index_file {
         	head1 => [ @head1 ],
         	head2 => [ @head2 ],
         	links_to => [ map { $_->text } $class->links($pa) ],
-        	dirs => [ @dirs ],
         	date => $time_string,
+        	namespaces => [ @namespaces ],
+        	nav_groups => [ $class->nav_groups($pa) ],
+        	index_entries => [ $class->index_entries($pa) ],
         }
         );
     
@@ -90,6 +88,15 @@ sub nav_groups {
     my @groups = map { split /\s/, $_ } map { $_ =~ m/groups (.*$)/; $1 } @for_groups;
     
     return @groups;
+}
+
+sub index_entries {
+    my $class = shift;
+    my $pa = shift;
+    
+    my @index = $pa->select("//:X");
+    
+    return map { $_->text } @index;
 }
 
 1;

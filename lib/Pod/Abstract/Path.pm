@@ -208,7 +208,7 @@ nodes of your Pod document. Use with caution in interactive systems.
 
 =head1 INTERFACE
 
-It is recommended you use the C<<Pod::Abstract::Node->select>> method
+It is recommended you use the C<< Pod::Abstract::Node->select >> method
 to evaluate Path expressions.
 
 If you wish to generate paths for use in other modules, use

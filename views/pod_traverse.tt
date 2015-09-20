@@ -6,9 +6,7 @@
 	   tt_name = tt_name.replace(":","X");
 	   tt_name = tt_name.replace("#","_");
 	   SET tt_name = "tt_" _ tt_name; %]
-	
 	[% INCLUDE $tt_name p_node=node %]
-	
   [% END %]
 [% END %]
 
@@ -68,6 +66,10 @@
 <span class="no_break">[% INCLUDE pod_tt pod=p_node %]</span>
 [% END %]
 
+[% BLOCK tt_XX %]
+<a id="sa_[% p_node.serial %]" name="sa_[% p_node.serial %]"></a>
+[% END %]
+
 [% BLOCK tt_XL %]
 <span class="link">
 	[% SET l = p_node.link_info %]
@@ -80,20 +82,15 @@
 				display_document('[% l.document %]','[% l.section %]');
 				return true;
 				">
-				[% l.text %]
-			</a>
+				[% l.text %][% IF l.section %] [% l.section %][% END %]</a>
 		[% ELSE %]
-			<a href="#[% l.section %]">
-				[% l.text %]
-			</a>
+			<a href="#[% l.section %]">[% l.text %]</a>
 		[% END %]
 	[% END %]
 </span>
 [% END %]
 
-[% BLOCK tt_pod %]
-[% INCLUDE pod_tt pod=p_node %]
-[% END %]
+[% BLOCK tt_pod %][% INCLUDE pod_tt pod=p_node %][% END %]
 
 [% BLOCK tt_over %]
 	[% IF p_node.select('/item[@label =~ {^ *\* *$}]').list.size %]
@@ -124,9 +121,8 @@
 <pre><code>[% p_node.body.replace('[\s\n]+$','') | html %]</code></pre>
 [% END %]
 
-[% BLOCK tt_Xtext %]
-[% p_node.text | html %]
-[% END %]
+[%# Wrapping text literals in spans allows user spaces to be preserved while all other spaces get crushed. There's probably a better way to do this but this is correct HTML and works fine. %]
+[% BLOCK tt_Xtext %]<span>[% p_node.text | html %]</span>[% END %]
 
 [% BLOCK tt_for %]
 [% END %]

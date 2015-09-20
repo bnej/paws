@@ -141,6 +141,20 @@ function refresh_document() {
     display_document(current_document);
 }
 
+function paws_go_delay(section_name, section_target, try_n) {
+    try_n = try_n || 1;
+    if($('#'+section_target).length > 0) {
+        paws_go(response.section_name, response.section_target);
+    } else {
+        if(try_n > 5) return;
+        
+        window.setTimeout(function() {
+            paws_go_delay(section_name, section_target, try_n + 1);
+        }, 200);
+    }
+    
+}
+
 function display_document(name,section) {
     var f_overlay = $('#overlay:checked').val();
     var f_view = $('#view').val();
@@ -169,8 +183,13 @@ function display_document(name,section) {
             });
             attach_listeners();
             
+            var section_name = response.section_name;
+            var section_target = response.section_target;
+            
             if(response.section_target) {
-                paws_go(response.section_name, response.section_target);
+                window.setTimeout(function() {
+                    paws_go_delay(section_name, section_target, 1);
+                }, 200);
             }
         }
     });

@@ -69,7 +69,9 @@ $( function() {
 recents['[% active_document %]'] = 1;
 current_document = '[% active_document %]';
 [% IF section_target %]
+window.setTimeout(function() {
   paws_go('[% section_name %]','[% section_target %]');
+}, 200);
 [% END %]
 var el = update_recents('[% active_document %]');
 el.addClass('uk-active');

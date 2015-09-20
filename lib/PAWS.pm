@@ -136,7 +136,7 @@ sub merge_annotations {
 
 sub extract_title($) {
     my $pa = shift;
-    my ($name_para) = $pa->select("/head1[\@heading eq 'NAME']/:paragraph");
+    my ($name_para) = $pa->select("/head1[\@heading =~ {^NAME}]/:paragraph");
     if($name_para) {
         my $name = $name_para->text;
 
@@ -144,7 +144,16 @@ sub extract_title($) {
 
         return $title, $sub;
     } else {
-        return ("","")
+        my ($head1) = $pa->select('/head1(0)@heading');
+        if($head1) {
+            if(length($head1->text) > 30) {
+                warn "This heading ",$head1->text," seems too long to index";
+                return ('','');
+            }
+            return ($head1->text, '');
+        } else {
+            return ("","")
+        }
     }
 }
 
@@ -283,6 +292,20 @@ sub load_key_view {
             if($hdg_text eq $section) {
                 $section_target = $head->serial;
                 last;
+            }
+        }
+        
+        if(!$section_target) {
+            my @ix = $pa->select('//:X|//@heading/:X|//@label/:X');
+            foreach my $ixe (@ix) {
+                my $it = $ixe->text;
+
+                warning("$it eq $section");
+                if($it eq $section) {
+                    $section_target = $ixe->serial;
+                    last;
+                    
+                }
             }
         }
     }    

@@ -12,7 +12,7 @@ find( sub {
     my $f = $_;
     if(-d $f) {
     } else {
-        if($f =~ m/\.pm$/) {
+        if($f =~ m/(\.pm|\.pl|\.pod)$/) {
             push @index_files, $File::Find::name;
         }
     }

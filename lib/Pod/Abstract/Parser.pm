@@ -152,6 +152,7 @@ sub command {
             $attr_node = Pod::Abstract::Node->new(
                 type => '@attribute',
                 );
+            $paragraph =~ s/[\s\n\r]+/ /g;
             my $pt = $self->parse_text($paragraph);
             $self->load_pt($attr_node, $pt);
             $attr{$attr_name} = $attr_node;
@@ -234,6 +235,7 @@ sub textblock {
         type => ':paragraph',
         p_break => $p_break,
         );
+    $paragraph =~ s/[\s\n\r]+/ /g;
     my $pt = $self->parse_text($paragraph);
     $self->load_pt($element_node, $pt);
 

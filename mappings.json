@@ -1,26 +1,5 @@
 {
       "mappings" : {
-         "function" : {
-            "properties" : {
-               "pod" : {
-                  "type" : "string"
-               },
-               "shortdesc" : {
-                  "type" : "string"
-               },
-               "parent_module" : {
-                  "type" : "string",
-                  "index" : "not_analyzed"
-               },
-               "date" : {
-                  "format" : "dateOptionalTime",
-                  "type" : "date"
-               },
-               "title" : {
-                  "type" : "string"
-               }
-            }
-         },
          "module" : {
             "properties" : {
                "pod" : {
@@ -33,12 +12,19 @@
                   "type" : "string",
                   "index" : "not_analyzed"
                },
+               "namespaces" : {
+                  "type" : "string",
+                  "index" : "not_analyzed"
+               },
                "date" : {
                   "format" : "dateOptionalTime",
                   "type" : "date"
                },
                "title" : {
                   "type" : "string"
+               },
+               "head1" : {
+                   "type" : "string"
                },
                "head2" : {
                   "type" : "string"

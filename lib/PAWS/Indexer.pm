@@ -14,6 +14,14 @@ use File::Basename;
 use strict;
 use warnings;
 
+=head1 NAME
+
+PAWS::Indexer - Index POD documents from files.
+
+=for group paws_index
+
+=cut
+
 sub index_file {
     my $class = shift;
     my $e = shift; 
@@ -49,7 +57,7 @@ sub index_file {
         	links_to => [ map { $_->text } $class->links($pa) ],
         	date => $time_string,
         	namespaces => [ @namespaces ],
-        	nav_groups => [ $class->nav_groups($pa) ],
+        	dims => $class->nav_groups($pa),
         	index_entries => [ $class->index_entries($pa) ],
         }
         );
@@ -61,7 +69,7 @@ sub links {
     my $class = shift;
     my $pa = shift;
     my %links = map { $_->link_info->{document} => $_ } 
-                grep { $_->link_info->{document} } $pa->select("//:L");
+                grep { $_->link_info->{document} } $pa->select('//:L|//@heading/:L|//@label/:L');
 
     # Find the "SEE ALSO" section and extract all the module names
     my ($see_also) = $pa->select("/head1[\@heading eq 'SEE ALSO']");
@@ -79,15 +87,42 @@ sub links {
     return @links;
 }
 
+=head2 nav_groups
+
+ my $nav_groups = $class->nav_groups($pa);
+
+=for feature nav_selection
+
+Find target dimensions for the current document - this will find
+value/section for dd/feature C<=for> blocks, and just value lists for
+C<group>.
+
+=cut
+
 sub nav_groups {
     my $class = shift;
     my $pa = shift;
     
-    my @for_groups = $pa->select("//for[. =~ {^groups}]");
+    my @for_groups = $pa->select("//for[. =~ {^(group|feature|dd) }]");
     
-    my @groups = map { split /\s/, $_ } map { $_ =~ m/groups (.*$)/; $1 } @for_groups;
+    my %dims = ( 'group' => [ ], 'dd' => [ ] );
+    foreach my $g (@for_groups) {
+        my ($p_head) = $g->select('...[@heading](0)@heading');
+        $g->body =~ m/(group|feature|dd)\s+(.*$)/;
+        my ($type,$value) = ($1, $2);
+        
+        my @values = split /\s+/,$value;
+        
+        if($type eq 'feature' || $type eq 'dd') {
+            $value = [ map { { 'value' => $_, 'in' => $p_head->text } } @values ];
+        } else {
+            $value = \@values;
+        }
+        
+        push @{$dims{$type}}, @$value;
+    }
     
-    return @groups;
+    return \%dims;
 }
 
 sub index_entries {

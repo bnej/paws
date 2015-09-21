@@ -85,6 +85,32 @@
       },
       "head2" : {
          "type" : "string"
+      },
+      "dims" : {
+          "type" : "object",
+          "properties" : {
+              "dd" : {
+                  "type" : "object",
+                  "properties" : {
+                      "value" : { "type" : "string", "index" : "not_analyzed" },
+                      "in" : { "type" : "string", "index" : "not_analyzed" }
+                  }
+              },
+              "feature" : {
+                  "type" : "object",
+                  "properties" : {
+                      "value" : { "type" : "string", "index" : "not_analyzed" },
+                      "in" : { "type" : "string", "index" : "not_analyzed" }
+                  }
+              },
+              "group" : {
+                  "type" : "object",
+                  "properties" : {
+                      "value" : { "type" : "string", "index" : "not_analyzed" },
+                      "in" : { "type" : "string", "index" : "not_analyzed" }
+                  }
+              }
+          }
       }
    }
 }

@@ -6,7 +6,7 @@ my @paths = @ARGV;
 
 my @index_files = ( );
 
-my $e = Search::Elasticsearch->new( nodes => [ 'localhost:9200' ] );
+my $e = PAWS->elastic;
 
 find( sub {
     my $f = $_;

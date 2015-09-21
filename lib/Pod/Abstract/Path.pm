@@ -783,12 +783,6 @@ sub parse_l_path {
         my $exp = $self->parse_expression($l);
         $exp->{'next'} = $self->parse_l_path($l);
         return $exp;
-    } elsif($tok == ATTR) {
-        return {
-            'action' => 'select_attribute',
-            'arguments' => [ $val ],
-            'next' => $self->parse_l_path($l),
-        }
     } else {
         die "Unexpected token, ", Dumper([$next]);
     }

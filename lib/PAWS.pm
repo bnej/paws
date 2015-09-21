@@ -8,8 +8,9 @@ use Pod::Abstract::Filter::overlay;
 use Pod::Abstract::Filter::uncut;
 use Pod::Abstract::Filter::sort;
 use POSIX qw(strftime);
-use PodSummary;
+use PAWS::PodSummary;
 use PAWS::Indexer;
+use PAWS::Dimension;
 use Pod::Abstract::BuildNode qw(node);
 use Digest::MD5 qw(md5_hex);
 use Search::Elasticsearch;
@@ -257,13 +258,17 @@ sub load_key_view {
     my ($name, $subtitle) = extract_title $pa;
 
     if($view eq 'summary') {
-        my $summ = PodSummary->new->filter($pa);
+        my $summ = PAWS::PodSummary->new->filter($pa);
         $_->detach foreach $summ->select('/head1[@heading eq \'NAME\']');
         $pa = $summ;
     } elsif($view eq 'uncut') {
         my $filter = Pod::Abstract::Filter::uncut->new;
         $pa = $filter->filter($pa);
     }
+    
+    my $dim_grab = PAWS::Dimension->new;
+    $pa = $dim_grab->filter($pa);
+    
     if(params->{overlay}) {
         my ($overlay_list) = $pa->select("//begin[. =~ {^:overlay}](0)");
         if($overlay_list) {
@@ -282,7 +287,7 @@ sub load_key_view {
         { title => $name, sub => $subtitle, pa => $pa }, 
         {layout => undef};
     
-    my $summ = PodSummary->new->filter($pa);
+    my $summ = PAWS::PodSummary->new->filter($pa);
     $_->detach foreach $summ->select('/head1[@heading eq \'NAME\']');
     
     my $menu = template "display_menu.tt", 

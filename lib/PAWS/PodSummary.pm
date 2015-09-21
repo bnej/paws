@@ -1,4 +1,4 @@
-package PodSummary;
+package PAWS::PodSummary;
 use strict;
 
 use base qw(Pod::Abstract::Filter);
@@ -15,12 +15,11 @@ sub filter {
     my $summary = node->root;
     if(@NAME) {
         # Clone the original NAME section into the new document
-        $_->detach foreach @NAME;
-        $summary->nest(@NAME);
+        my @NEW_NAME = $_->duplicate foreach @NAME;
+        $summary->nest(@NEW_NAME);
     }
     my $summ_block = node->head1('SUMMARY');
     $summary->nest($summ_block);
-
     
     $self->summarise_headings($pa,$summ_block);
     $summ_block->nest();

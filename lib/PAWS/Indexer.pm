@@ -107,7 +107,8 @@ sub nav_groups {
     
     my %dims = ( 'group' => [ ], 'dd' => [ ] );
     foreach my $g (@for_groups) {
-        my ($p_head) = $g->select('...[@heading](0)@heading');
+        my ($p_head) = $g->select('...[@heading|@label]');
+        $p_head = $p_head->param('heading') || $p_head->param('label');
         $g->body =~ m/(group|feature|dd)\s+(.*$)/;
         my ($type,$value) = ($1, $2);
         

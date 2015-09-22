@@ -6,10 +6,10 @@
 	[% ELSE %]
 		[% IF l.document %]
 			<a href="#"
-				onClick="
-				display_document('[% l.document %]');
+				onClick='
+				display_document([% l.document.json %]);
 				return false;
-				">
+				'>
 				[% l.text %]
 			</a>
 		[% ELSE %]

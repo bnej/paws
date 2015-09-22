@@ -303,9 +303,9 @@ sub load_key_view {
     # Find a link target, if provided:
     my $section_target = undef;
     if($section) {
-        my @headings = $pa->select('//[@heading]');
+        my @headings = $pa->select('//[@heading|@label]');
         foreach my $head(@headings) {
-            my ($hdg) = $head->select('@heading');
+            my ($hdg) = $head->param('heading') || $head->param('label');
             my $hdg_text = $hdg->text;
             
             if($hdg_text eq $section) {

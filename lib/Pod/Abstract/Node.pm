@@ -369,11 +369,13 @@ sub link_info {
         my $url = "$doc/$section";
         return {
             url => $url,
+            link_text => $text,
             text => $text || $url,
         };
     } else {
         return {
             text => $text || $doc || $section,
+            link_text => $text,
             document => $doc,
             section => $section,
         };

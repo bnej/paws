@@ -3,7 +3,7 @@
 	[% FOREACH r IN results.modules %]
 		[% SET s = r.item('_source') %]
 		[% IF r.item('_type') == 'module' %]
-		<div class="result_line" paws_link="[% s.title %]">
+		<div class="result_line" paws_link="[% s.title | html %]">
 			[% s.title | html %]
 			<div class="result_sd">
 				[% s.shortdesc | html %]
@@ -11,16 +11,16 @@
 		</div>
 		[% IF r.highlight.head2 %]
 			[% FOREACH h2 IN r.highlight.head2 %]
-			<div class="result_line sub_result_line" paws_link="[% s.title %]" paws_section="[% h2.remove('<\/?em>') %]">[% h2 %]</div>
+			<div class="result_line sub_result_line" paws_link="[% s.title | html%]" paws_section="[% h2.remove('<\/?em>') %]">[% h2 %]</div>
 			[% END %]
 		[% END %]
 		[% IF r.highlight.index_entries %]
 			[% FOREACH ix IN r.highlight.index_entries %]
-			<div class="result_line sub_result_line" paws_link="[% s.title %]" paws_section="[% ix.remove('<\/?em>') %]">Index: [% ix %]</div>
+			<div class="result_line sub_result_line" paws_link="[% s.title | html %]" paws_section="[% ix.remove('<\/?em>') | html %]">Index: [% ix %]</div>
 			[% END %]
 		[% END %]		
 		[% ELSIF r.item('_type') == 'annotation' %]
-		<div class="result_line" paws_link="[% s.module %]">
+		<div class="result_line" paws_link="[% s.module | html %]">
 			[% s.module | html %]
 			<div class="result_sd">
 				[% INCLUDE pod_traverse.tt pod = s.pa %]

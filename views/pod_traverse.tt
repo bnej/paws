@@ -1,3 +1,4 @@
+[% USE JSON ( pretty => 0 ) %]
 [% INCLUDE pod_tt pod=pod %]
 
 [% BLOCK pod_tt %]
@@ -78,17 +79,22 @@
 	[% ELSE %]
 		[% IF l.document %]
 			<a href="#"
-				onClick="
-				display_document('[% l.document %]','[% l.section %]');
+				onClick='
+				display_document([% l.document.json %], [% l.section.json %]);
 				return false;
-				">
-				[% IF l.section %][% l.section %] in [% END %][% l.text %]</a>
+				'>
+				[% IF link_text %]
+				[% l.link_text %]
+				[% ELSE %]
+				[% IF l.section %][% l.section %] in [% END %][% l.text %]
+				[% END %]
+				</a>
 		[% ELSE %]
 			<a href="#"
-				onClick="
-				display_document(current_document,'[% l.section %]');
+				onClick='
+				display_document(current_document,[% l.section.json %]);
 				return false;
-				">
+				'>
 			[% l.text %]</a>
 		[% END %]
 	[% END %]
@@ -113,7 +119,7 @@
 [% ELSIF p_node.param('label').pod.match('^[0-9]+\.?$') %]
   <li>[% INCLUDE pod_tt pod=p_node %]</li>
 [% ELSE %]
-  <dt>[% INCLUDE annotate_link.tt %][% INCLUDE pod_tt pod=p_node.param('label') %]</dt>
+  <dt><a id="sa_[% p_node.serial %]" name="sa_[% p_node.serial %]"></a>[% INCLUDE annotate_link.tt %][% INCLUDE pod_tt pod=p_node.param('label') %]</dt>
   <dd>[% INCLUDE pod_tt pod=p_node %]</dd>
 [% END %]
 [% END %]

@@ -1,3 +1,4 @@
+[% USE JSON ( pretty => 0 ) %]
 
 	<div class="uk-width-medium-1-4 uk-hidden-small uk-grid-small">
 		<div class="uk-panel">
@@ -66,14 +67,14 @@ $( function() {
   load_recents();
 /* Set one open document on init if we're loading from previous state */
 [% IF active_document %]
-recents['[% active_document %]'] = 1;
-current_document = '[% active_document %]';
+recents[[% active_document.json %]] = 1;
+current_document = [% active_document.json %];
 [% IF section_target %]
 window.setTimeout(function() {
-  paws_go('[% section_name %]','[% section_target %]');
+  paws_go([% section_name.json %],[% section_target.json %]);
 }, 200);
 [% END %]
-var el = update_recents('[% active_document %]');
+var el = update_recents([% active_document.json %]);
 el.addClass('uk-active');
 [% END %]
 });

@@ -40,7 +40,7 @@
     [% SET parent = 1 %]
   [% END %]
   <li class="[% li_class %]">
-	<a href="#"[% IF !parent %]onClick="return paws_go('[% p_node.param('label').text %]','[% p_node.param('original_serial') %]')"[% END %]>[% INCLUDE pod_tt pod=p_node.param('label') %]</a>
+	<a href="#"[% IF !parent %]onClick='return paws_go([% p_node.param('label').text.json %],[% p_node.param('original_serial').json %])'[% END %]>[% INCLUDE pod_tt pod=p_node.param('label') %]</a>
 	  [% INCLUDE pod_tt pod=p_node %]
 	</li>
 [% END %]

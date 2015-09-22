@@ -186,7 +186,10 @@ sub text {
     }
     
     foreach my $c (@children) {
-        $r .= $c->text;
+        # Recurse into child elements, but special case :X as these are invisible.
+        # This dodges past a bit of naff pod use which is in perlpod.pod - comes
+        # down to how poorly defined bullet lists are.
+        $r .= $c->text unless $c->type eq ':X';
     }
     
     return $r;

@@ -362,7 +362,9 @@ var PAWS_FastSearch = Class.extend({
           obj.s_field = field;
           obj.s_path = request_path;
           obj.keynav = false;
+          obj.refinements = '';
           obj.initializeElements();
+          obj.fs_load();
       },
       px: function() {
           var obj = this;
@@ -404,7 +406,7 @@ var PAWS_FastSearch = Class.extend({
         }
     },
     fs_blur: function() {
-        this.fs_hide();
+        //this.fs_hide();
     },
     fs_hide: function() {
         var obj = this;
@@ -425,6 +427,29 @@ var PAWS_FastSearch = Class.extend({
                 obj.fs_result_click(event, this);
             });
         });
+    },
+    fs_toggles: function(items) {
+        var obj = this;
+        items.each( function() {
+            $(this).on('click', function(event) {
+                obj.fs_toggle_refinement(this);
+            });
+        });
+    },
+    fs_toggle_refinement: function(item) {
+        var div = this.fs_div();
+        if($(item).hasClass("uk-active"))
+            $(item).removeClass("uk-active");
+        else
+            $(item).addClass("uk-active");
+        var menu_items = div.find(".refine.uk-active");
+        var selected = [ ];
+        menu_items.each(function() {
+            selected.push($(this).attr("paws_select"));
+        });
+        
+        this.refinements = selected.join(" ");
+        this.fs_load();
     },
     fs_result_over: function(ev,elt) {
         if(this.selected_elt != null) {
@@ -455,36 +480,6 @@ var PAWS_FastSearch = Class.extend({
                 this.keynav = true;
             }
             ev.stopPropagation();
-        } else if(this.keynav && 
-                  this.selected_elt &&
-                  (ev.which == KEY_LEFT || ev.which == KEY_RIGHT)) {
-            var sibs = $(this.selected_elt).prevAll();
-            var position = sibs.length - 1; /* one for heading */
-            var column = $(this.selected_elt).parent(".fs_section");
-            var next_el = null;
-            switch (ev.which) {
-                case KEY_LEFT:
-                  next_col = $(column).prev(".fs_section");
-                  break;
-                case KEY_RIGHT:
-                  next_col = $(column).next(".fs_section");
-                  break;
-            }
-            if(next_col.length > 0) {
-                var col_results = next_col.children(".result_line");
-                if(col_results.length <= position) {
-                    next_el = col_results.last();
-                } else {
-                    next_el = col_results[position];
-                }
-                if(next_el) {
-                    if(this.selected_elt)
-                        $(this.selected_elt).removeClass("hilight");
-                    this.selected_elt = next_el;
-                    $(this.selected_elt).addClass("hilight");
-                }
-            }
-            ev.stopPropagation()
         } else if(ev.which != KEY_RETURN) {
             this.keynav = false;
         }
@@ -494,6 +489,7 @@ var PAWS_FastSearch = Class.extend({
                 var paws_link = $(this.selected_elt).attr('paws_link');
                 var paws_section = $(this.selected_elt).attr('paws_section') || '';
                 display_document(paws_link, paws_section);
+                this.fs_hide();
                 ev.stopPropagation();
             }
         }
@@ -504,35 +500,43 @@ var PAWS_FastSearch = Class.extend({
         var paws_section = $(elt).attr('paws_section') || '';
         
         display_document(paws_link, paws_section);
+        this.fs_hide();
     },
     fs_load: function() {
         var div = this.fs_div();
         var path = this.s_path;
         var obj = this;
         var tval = this.terms();
+        var filter_namespaces = this.refinements;
         this.ajax_active = true;
         $.ajax({
             url: path, type: "get", dataType: "html",
-            data: { terms: tval },
+            data: { terms: tval, filter_namespaces: filter_namespaces },
             success: function(response){
                 var response_divs = $(div).html(response).find(".fs_section");
                 
                 var section_count = response_divs.length;
                 div.attr("class","uk-grid uk-grid-small");
-                div.addClass("uk-width-medium-2-4");
+                div.addClass("uk-width-medium-1-1");
                 div.addClass("uk-width-small-1-1");
                 div.css('position', 'absolute')
                 obj.ajax_active = false;
                 obj.selected_elt = null;
 
                 var total_lines = div.find(".result_line");
+                var menu_items = div.find(".refine");
+                var close = div.find("#fs_search_close");
+                close.on("click", function() {
+                    obj.fs_hide()
+                });
                 if(total_lines.length == 0) {
-                    obj.fs_hide();
+                    //obj.fs_hide();
+                    obj.prev_value = tval;
                     return true;
                 } else {
                     obj.has_results = true;
-                    obj.fs_div().css('display','block');
                     obj.fs_mousefollow(total_lines);
+                    obj.fs_toggles(menu_items);
                     obj.prev_value = tval;
                 }
             }

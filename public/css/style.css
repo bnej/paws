@@ -227,8 +227,8 @@ div#paws_fsearch {
   background-color:white;
   border:1px solid #888;
   margin:0;
-  padding:0;
-  box-shadow:         2px 2px 13px 0px rgba(24, 38, 63, 0.75);
+  padding:10px;
+  box-shadow: 2px 5px 14px 0px rgba(24, 38, 63, .25);
 }
 
 div.fs_section {

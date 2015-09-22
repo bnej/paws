@@ -341,6 +341,50 @@ sub load_key_view {
 
 any '/_complete' => sub {
     my $terms = params->{terms};
+    my $filter_ns = params->{filter_namespaces};
+    
+    my $filter = {
+        };
+    my %selected = ( );
+    if($filter_ns) {
+        my @ns = split /\s/, $filter_ns;
+        $filter->{term} = {
+            namespaces => [ @ns ],
+            execution => "and"
+        };
+        $selected{$_} = 1 foreach @ns;
+    }
+    
+    my %query = ( 
+        query => {
+            filtered => {
+                filter => $filter
+            }
+        }
+        );
+        
+    if($terms) {
+        %query = ( query => {
+            filtered => {
+                query => {
+                    multi_match => {
+                        query => $terms,
+                        fields => ["title^4","index_entries^5","shortdesc^2","head2^2", "module", "pod"]
+                    }
+                },
+                filter => $filter
+            }
+        },
+        "highlight"=> {
+          "fields"=> {
+            "title"=> {},
+            "index_entries"=> {},
+            "shortdesc"=> {},
+            "head2"=> {}
+          }
+        },
+        )
+    }
     
     my $e = elastic();
     my $results = $e->search(
@@ -348,19 +392,11 @@ any '/_complete' => sub {
         type => ['module','annotation'],
         _source => [ "title","shortdesc","pod","module" ],
         body => {
-            query => {
-                multi_match => {
-                    query => $terms,
-                    fields => ["title^4","index_entries^5","shortdesc^2","head2^2", "module", "pod"]
+            %query,
+            "aggs" => {
+                "namespaces" => {
+                    "terms" => { "field" => "namespaces" }
                 }
-            },
-            "highlight"=> {
-              "fields"=> {
-                "title"=> {},
-                "index_entries"=> {},
-                "shortdesc"=> {},
-                "head2"=> {}
-              }
             }
         }
         );
@@ -377,6 +413,8 @@ any '/_complete' => sub {
     $columns += 1 if @$out_mod > 0;
     
     my $out = {
+        selected => \%selected,
+        es_results => $results,
         modules => $out_mod,
         columns => $columns
     };

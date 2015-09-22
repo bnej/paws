@@ -32,7 +32,7 @@
 					<input size="50" name="terms" id="terms" autocomplete="off" type="search" class="uk-search-field" placeholder="search..."/>
 					</form>
 					<div style="position:absolute; right: 2%; width:96%; top:42px;">
-					<div id="paws_fsearch" style="display: none; positon: absolute; right:0px; top: 0px;">
+					<div id="paws_fsearch" class="uk-grid" style="display: none; positon: absolute; right:0px; top: 0px;">
 					</div>
 					</div>
 				<script>

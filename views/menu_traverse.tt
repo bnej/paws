@@ -9,7 +9,11 @@
 	   tt_name = tt_name.replace("#","_");
 	   SET tt_name = "tt_" _ tt_name; %]
 	
+	[% TRY %]
 	[% INCLUDE $tt_name p_node=node depth=depth %]
+	[% CATCH %]
+	<b>no processing for node.type</b>
+	[% END %]
 	
   [% END %]
 [% END %]
@@ -54,6 +58,42 @@
 	<h3>Example:</h3>
 	<pre>[% p_node.body.replace('[\s\n]+$','') | html %]</pre>
 </div>
+[% END %]
+
+[% BLOCK tt_XB %]
+<span class="strong">[% INCLUDE pod_tt pod=p_node %]</span>
+[% END %]
+
+[% BLOCK tt_XC %]
+<code>[% INCLUDE pod_tt pod=p_node %]</code>
+[% END %]
+
+[% BLOCK tt_XF %]
+<span class="fixed">[% INCLUDE pod_tt pod=p_node %]</span>
+[% END %]
+
+[% BLOCK tt_XI %]
+<span class="emph">[% INCLUDE pod_tt pod=p_node %]</span>
+[% END %]
+
+[% BLOCK tt_XE %]
+[% p_node.text | html %]
+[% END %]
+
+[% BLOCK tt_XS %]
+<span class="no_break">[% INCLUDE pod_tt pod=p_node %]</span>
+[% END %]
+
+[% BLOCK tt_XX %]
+<a id="sa_[% p_node.serial %]" name="sa_[% p_node.serial %]"></a>
+[% END %]
+
+[% BLOCK tt_XL %]
+[% INCLUDE pod_tt pod=p_node %]
+[% END %]
+
+[% BLOCK tt_XZ %]
+[% INCLUDE pod_tt pod=p_node %]
 [% END %]
 
 [% BLOCK tt_Xtext %]

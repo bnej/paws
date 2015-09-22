@@ -1,5 +1,19 @@
+<a href='#' style='position:absolute; left: -12px; top:-12px; z-index: 1000;' class='uk-close uk-close-alt' id="fs_search_close"></a>
 [% IF results.modules.size > 0 %]
-<div class="fs_section uk-width-medium-1-[% results.columns %] uk-width-small-1-1 modules" id="fs_modules">
+<div class="uk-width-medium-1-4">
+	[% SET aggs = results.es_results.aggregations %]
+	<div class="uk-panel uk-panel-box">
+		<ul class="uk-nav uk-nav-side">
+			<li class="uk-nav-header">Namespaces</li>
+			[% FOREACH ns IN aggs.namespaces.buckets %]
+			<li class="refine [% IF results.selected.item(ns.key) %]uk-active[% END %]" paws_select="[% ns.key | html %]"><a href="#">
+				<span style="width:30px; text-align: right;">[% ns.doc_count %]</span> [% ns.key | html %]
+			</a></li>
+			[% END %]
+		</ul>
+	</div>
+</div>
+<div class="fs_section uk-width-medium-3-4 uk-width-small-1-1 modules" id="fs_modules">
 	[% FOREACH r IN results.modules %]
 		[% SET s = r.item('_source') %]
 		[% IF r.item('_type') == 'module' %]
@@ -28,5 +42,11 @@
 		</div>
 		[% END %]
 	[% END %]
+</div>
+[% ELSE %]
+<div class="uk-width-medium-1-1 uk-width-small-1-1">
+	<blockquote>
+	<p><i class="uk-icon-search uk-icon-large uk-align-left"></i>No results. Type something else?</p>
+	</blockquote>
 </div>
 [% END %]

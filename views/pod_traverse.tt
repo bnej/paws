@@ -7,7 +7,11 @@
 	   tt_name = tt_name.replace(":","X");
 	   tt_name = tt_name.replace("#","_");
 	   SET tt_name = "tt_" _ tt_name; %]
-	[% INCLUDE $tt_name p_node=node %]
+	[% TRY %]
+	[% INCLUDE $tt_name p_node=node depth=depth %]
+	[% CATCH %]
+	<b>no processing for node.type</b>
+	[% END %]
   [% END %]
 [% END %]
 
@@ -114,9 +118,9 @@
 [% END %]
 
 [% BLOCK tt_item %]
-[% IF p_node.param('label').pod.match('^ *\* *$') %]
+[% IF p_node.param('label').text.match('^ *\* *$') %]
   <li>[% INCLUDE pod_tt pod=p_node %]</li>
-[% ELSIF p_node.param('label').pod.match('^[0-9]+\.?$') %]
+[% ELSIF p_node.param('label').text.match('^[0-9]+\.?$') %]
   <li>[% INCLUDE pod_tt pod=p_node %]</li>
 [% ELSE %]
   <dt><a id="sa_[% p_node.serial %]" name="sa_[% p_node.serial %]"></a>[% INCLUDE annotate_link.tt %][% INCLUDE pod_tt pod=p_node.param('label') %]</dt>

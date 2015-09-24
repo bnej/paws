@@ -397,7 +397,10 @@ var PAWS_FastSearch = Class.extend({
     fs_load_praps: function() {
         if(this.prev_value != this.terms()) {
             if(!this.ajax_active) {
-                this.refinements = ''; // clear refinements if we're sending a new query.
+                // When sending a new query (term has changed), clear refinements and
+                // reset to page 1.
+                this.refinements = '';
+                this.page = 1;
                 this.fs_load();
                 return true;
             }

@@ -188,6 +188,7 @@ function display_document(name,section) {
             var section_target = response.section_target;
             
             loading_off();
+            
             if(section_target) {
                 window.setTimeout(function() {
                     paws_go_delay(section_name, section_target, 1);
@@ -248,7 +249,7 @@ function edit_annotation(event) {
 
     overlay_on();
     var ed = $('#annotate_edit');
-    ed.innerHTML = '<div class="loader" />'
+    ed.html( '<div class="load_icon_wrapper"><i class="uk-icon-paw uk-icon-large uk-icon-spin"></i></div>' );
     ed.addClass("on");
     
     new $.ajax({
@@ -273,8 +274,8 @@ function save_annotation(ev) {
     var module_name = form.children('[name="module"]').val()
     
     overlay_on();
-    var ed = $('annotate_edit');
-    ed.innerHTML = '<div class="loader" />'
+    var ed = $('#annotate_edit');
+    ed.html( '<div class="load_icon_wrapper"><i class="uk-icon-paw uk-icon-large uk-icon-spin"></i></div>' );
     
     new $.ajax({
         url: "/_save_annotation",
@@ -283,8 +284,7 @@ function save_annotation(ev) {
         data: params,
         success: function(response) {
             if(response.saved == 'yes') {
-                overlay_off();
-                var f = function() { display_document(module_name) };
+                var f = function() { overlay_off(); display_document(module_name); };
                 _.delay(f,1000);
             }
         }
@@ -363,6 +363,7 @@ var PAWS_FastSearch = Class.extend({
           obj.s_path = request_path;
           obj.keynav = false;
           obj.refinements = '';
+          obj.page = 1;
           obj.initializeElements();
           obj.fs_load();
       },
@@ -396,8 +397,12 @@ var PAWS_FastSearch = Class.extend({
     fs_load_praps: function() {
         if(this.prev_value != this.terms()) {
             if(!this.ajax_active) {
+                this.refinements = ''; // clear refinements if we're sending a new query.
                 this.fs_load();
+                return true;
             }
+        } else {
+            return false;
         }
     },
     fs_focus: function() {
@@ -427,6 +432,20 @@ var PAWS_FastSearch = Class.extend({
                 obj.fs_result_click(event, this);
             });
         });
+    },
+    fs_pager: function(items) {
+        var obj = this;
+        items.each( function() {
+            $(this).on('click', function(event) {
+                obj.fs_select_page(this);
+            });
+        });
+    },
+    fs_select_page: function(item) {
+        var div = this.fs_div();
+        this.page = $(item).attr("paws_page");
+        
+        this.fs_load();
     },
     fs_toggles: function(items) {
         var obj = this;
@@ -508,10 +527,12 @@ var PAWS_FastSearch = Class.extend({
         var obj = this;
         var tval = this.terms();
         var filter_namespaces = this.refinements;
+        var page = this.page;
         this.ajax_active = true;
+        $("#search_info").removeClass('uk-icon-search').addClass("uk-icon-paw");
         $.ajax({
             url: path, type: "get", dataType: "html",
-            data: { terms: tval, filter_namespaces: filter_namespaces },
+            data: { terms: tval, filter_namespaces: filter_namespaces, page: page },
             success: function(response){
                 var response_divs = $(div).html(response).find(".fs_section");
                 
@@ -522,23 +543,27 @@ var PAWS_FastSearch = Class.extend({
                 div.css('position', 'absolute')
                 obj.ajax_active = false;
                 obj.selected_elt = null;
+                $("#search_info").removeClass("uk-icon-paw").addClass('uk-icon-search');
 
                 var total_lines = div.find(".result_line");
                 var menu_items = div.find(".refine");
+                var page_selectors = div.find("a.paws_pagenum");
+                
                 var close = div.find("#fs_search_close");
                 close.on("click", function() {
                     obj.fs_hide()
                 });
                 if(total_lines.length == 0) {
-                    //obj.fs_hide();
                     obj.prev_value = tval;
                     return true;
                 } else {
                     obj.has_results = true;
                     obj.fs_mousefollow(total_lines);
                     obj.fs_toggles(menu_items);
+                    obj.fs_pager(page_selectors);
                     obj.prev_value = tval;
                 }
+                obj.fs_load_praps(); // Text may still be changing.
             }
         });
     },

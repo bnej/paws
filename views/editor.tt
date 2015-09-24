@@ -2,7 +2,7 @@
 <form>
 		<input type="hidden" name="module" value="[% module | html %]" />
 		<input type="hidden" name="node_path" value="[% node_path | html	%]" />
-		<textarea name="annotation" style="width:100%; height: 330px;">[% annotation | html %]</textarea>
-		<button id="edit-save">Save</button>
+		<textarea name="annotation" style="width:100%; height: 310px;">[% annotation | html %]</textarea>
+		<button class="uk-button uk-button-primary" id="edit-save">Save</button>
 	</fieldset>
 </form>

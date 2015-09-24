@@ -74,6 +74,7 @@ window.setTimeout(function() {
   paws_go([% section_name.json %],[% section_target.json %]);
 }, 200);
 [% END %]
+attach_listeners();
 var el = update_recents([% active_document.json %]);
 el.addClass('uk-active');
 [% END %]

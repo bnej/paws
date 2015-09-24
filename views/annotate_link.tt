@@ -2,6 +2,7 @@
 <form>
 	<input type="hidden" name="module" value="[% title | html %]" />
 	<input type="hidden" name="node_path" value="[% node.path_to | html %]" />
-	<button class="annotate_button">+</button>
+	<button class="annotate_button uk-button uk-button-primary"><i class="uk-icon-edit"></i></a>
+	</button>
 </form>
 [% END %]

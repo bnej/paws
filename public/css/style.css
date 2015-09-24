@@ -15,23 +15,9 @@ h1, h2, h3, h4, h5 {
     margin: 0 0 5px 0;
 }
 
-button {
-  padding:2px;
-  background-color: #ddf;
-  border: 1px solid #666;
-  color:#000;
-  text-decoration:none;
-  border-radius: 6px;
-  box-shadow:         1px 1px 2px 0px rgba(24, 38, 63, 0.75);
-}
-
-button:hover {
-    background-color: #eef;
-}
-
 button.annotate_button {
     float: right;
-    width: 20px; height: 20px;
+    padding: 0 7px
 }
 
 fieldset {
@@ -156,6 +142,18 @@ div.load_icon_wrapper {
 div.load_icon_wrapper .uk-icon-large:before {
     font-size: 200px;
     color: white;
+}
+
+div#annotate_edit div.load_icon_wrapper {
+    position:absolute;
+    margin-left: -41px;
+    margin-top: -50px;
+    
+}
+
+div#annotate_edit div.load_icon_wrapper .uk-icon-large:before {
+    font-size: 100px;
+    color: black;
 }
 
 div.annotate_edit {

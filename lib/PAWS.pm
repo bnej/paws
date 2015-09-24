@@ -7,7 +7,7 @@ use Pod::Abstract::Filter::summary;
 use Pod::Abstract::Filter::overlay;
 use Pod::Abstract::Filter::uncut;
 use Pod::Abstract::Filter::sort;
-use POSIX qw(strftime);
+use POSIX qw(strftime ceil floor);
 use PAWS::PodSummary;
 use PAWS::Indexer;
 use PAWS::Dimension;
@@ -17,7 +17,7 @@ use Search::Elasticsearch;
 
 use Data::Dumper;
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 sub error_doc {
 my $term = shift;
@@ -37,7 +37,7 @@ EOF
 my $elastic = undef;
 
 sub elastic {
-    my $self = shift
+    my $self = shift;
     return $elastic if defined $elastic;
     my $e = Search::Elasticsearch->new( nodes => [ 'localhost:9200' ] );
     $elastic = $e;
@@ -339,27 +339,41 @@ sub load_key_view {
     };
 }
 
+my $PAGE_SIZE = 10;
+
+sub pages_for {
+    my $count = shift;
+    my $current_page = shift;
+    
+    my $n_pages = ceil($count / $PAGE_SIZE);
+    $n_pages = 15 if $n_pages > 15;
+    
+    return [ 1 .. $n_pages ];
+}
+
 any '/_complete' => sub {
     my $terms = params->{terms};
     my $filter_ns = params->{filter_namespaces};
+    my $page = params->{page} || 1;
     
     my $filter = {
         };
     my %selected = ( );
     if($filter_ns) {
         my @ns = split /\s/, $filter_ns;
-        $filter->{term} = {
+        $filter->{terms} = {
             namespaces => [ @ns ],
             execution => "and"
         };
         $selected{$_} = 1 foreach @ns;
     }
+    my $offset = ($page - 1) * $PAGE_SIZE;
     
     my %query = ( 
         query => {
             filtered => {
                 filter => $filter
-            }
+            },
         }
         );
         
@@ -373,7 +387,7 @@ any '/_complete' => sub {
                     }
                 },
                 filter => $filter
-            }
+            },
         },
         "highlight"=> {
           "fields"=> {
@@ -393,15 +407,23 @@ any '/_complete' => sub {
         _source => [ "title","shortdesc","pod","module" ],
         body => {
             %query,
+            from => $offset,
+            size => $PAGE_SIZE,
             "aggs" => {
                 "namespaces" => {
-                    "terms" => { "field" => "namespaces" }
+                    "terms" => { 
+                        "field" => "namespaces",
+                        "size" => 15,
+                        "shard_size" => 20,
+                    },
                 }
             }
         }
         );
     
     my $out_mod = $results->{hits}{hits};
+    my $total_hits = $results->{hits}{total};
+    my $time = $results->{took};
 
     foreach my $oa (@$out_mod) {
         if($oa->{_type} eq 'annotation') {
@@ -416,7 +438,11 @@ any '/_complete' => sub {
         selected => \%selected,
         es_results => $results,
         modules => $out_mod,
-        columns => $columns
+        columns => $columns,
+        current_page => $page,
+        total_hits => $total_hits,
+        time => $time,
+        pages => pages_for($total_hits, $page)
     };
     
     template "autocomplete.tt",

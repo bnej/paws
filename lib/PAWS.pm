@@ -300,33 +300,31 @@ sub load_key_view {
         { links => \@links }, 
         { layout => undef };
     
+    my %section_id = ( );
+
+    # Map all section IDs. These may be cached.
+    my @headings = $pa->select('//[@heading|@label]');
+    foreach my $head(@headings) {
+        my ($hdg) = $head->param('heading') || $head->param('label');
+        my $hdg_text = $hdg->text;
+        
+        # Take the first ID for each heading, no overwrite.
+        $section_id{$hdg_text} = $head->serial 
+            unless defined $section_id{$hdg_text};
+    }
+        
+    my @ix = $pa->select('//:X|//@heading/:X|//@label/:X');
+    foreach my $ixe (@ix) {
+        my $it = $ixe->text;
+        $section_id{$it} = $ixe->serial
+            unless defined $section_id{$ixe->serial};
+    }
+
     # Find a link target, if provided:
     my $section_target = undef;
     if($section) {
-        my @headings = $pa->select('//[@heading|@label]');
-        foreach my $head(@headings) {
-            my ($hdg) = $head->param('heading') || $head->param('label');
-            my $hdg_text = $hdg->text;
-            
-            if($hdg_text eq $section) {
-                $section_target = $head->serial;
-                last;
-            }
-        }
-        
-        if(!$section_target) {
-            my @ix = $pa->select('//:X|//@heading/:X|//@label/:X');
-            foreach my $ixe (@ix) {
-                my $it = $ixe->text;
-
-                if($it eq $section) {
-                    $section_target = $ixe->serial;
-                    last;
-                    
-                }
-            }
-        }
-    }    
+        $section_target = $section_id{$section};
+    }
     
     return {
         active_document => $key,
@@ -334,6 +332,7 @@ sub load_key_view {
         menu => $menu,
         links => $links,
         inbound_links => inbound_links($key),
+        section_id => \%section_id,
         section_name => $section,
         section_target => $section_target,
     };

@@ -96,7 +96,7 @@
 		[% ELSE %]
 			<a href="#"
 				onClick='
-				display_document(current_document,[% l.section.json %]);
+				paws_go([% l.section.json %], null);
 				return false;
 				'>
 			[% l.text %]</a>

@@ -1,5 +1,6 @@
 
 var recents = { };
+var section_id = { };
 var current_document;
 var current_section;
 
@@ -173,6 +174,7 @@ function display_document(name,section) {
             $('#doc_links').html(response.links);
             $('#inbound_links').html(response.inbound_links);
             recents[name] = 1;
+            section_id = response.section_id;
             current_document = name;
             current_section = '';
             var el = update_recents(name);
@@ -202,9 +204,12 @@ function display_document(name,section) {
     return false;
 }
 
-function paws_go(section_name, section_id) {
+function paws_go(section_name, sid) {
+    if(!sid)
+        sid = section_id[section_name];
+    
     current_section = section_name;
-    UIkit.Utils.scrollToElement(UIkit.$('#sa_' + section_id));
+    UIkit.Utils.scrollToElement(UIkit.$('#sa_' + sid));
     set_url_state();
     return false;
 }

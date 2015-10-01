@@ -69,6 +69,7 @@ $( function() {
 [% IF active_document %]
 recents[[% active_document.json %]] = 1;
 current_document = [% active_document.json %];
+section_id = [% section_id.json %];
 [% IF section_target %]
 window.setTimeout(function() {
   paws_go([% section_name.json %],[% section_target.json %]);

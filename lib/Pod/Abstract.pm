@@ -33,55 +33,37 @@ Pod::Abstract - Abstract document tree for Perl POD documents
 
 =head1 DESCRIPTION
 
-POD::Abstract provides a means to load a POD (or POD compatible)
-document without direct reference to it's syntax, and perform
-manipulations on the abstract syntax tree.
+POD::Abstract provides a means to load a POD document without direct
+reference to it's syntax, and perform manipulations on the abstract
+syntax tree.
 
 This can be used to support additional features for POD, to format
 output, to compile into alternative formats, etc.
 
-=head2 WHY?
+=head2 USAGE
 
-If you've ever asked yourself "What does Pod do for me?", this module
-is intended to answer that question.
+C<Pod::Abstract> allows easy manupulation and traversal of POD or Perl
+files containing POD, without having to manually do any string
+manipulation.
 
-While Pod looks like a simple format, the specification calls for a
-number of special cases to be handled, and that makes any software
-that works on Pod as text more complex than it needs to be.
+It allows you to easily write formatters, filters, test scripts, etc
+for POD.
 
-In addition to this, Pod does not lend itself to a natural structured
-model. This makes it difficult to manipulate without damaging the
-validity of the document.
-
-Pod::Abstract solves these problems by loading the document into a
-structured tree, and providing consistent traversal, searching,
-manpulation and re-serialisation. Pod related utilities are easy to
-write using Pod::Abstract.
-
-The design goal of Pod::Abstract is to do the hard work for the
-programmer - the library should work for you, and as such it should be
-significantly easier than string mashing what you want out of a Pod
-document.
+C<Pod::Abstract> is based on the standard L<Pod::Parser> module.
 
 =head2 PROCESSING MODEL
 
-The intent with POD::Abstract is to provide a means to decorate a
-parse tree, rather than manipulate text, to allow other software to
-add features and functionality to POD based documenation systems.
+C<Pod::Abstract> allows documents to be loaded, decorated, and
+manupulated in multiple steps. It can also make generating a POD
+formatter very simple. You can easily add features to an existing POD
+formatter, since any POD abstract object can be written out as a POD
+document.
 
-If you wish to write modules that interact nicely with other
-POD::Abstract modules, then you should provide a POD::Abstract -E<gt>
-POD::Abstract translation. Leave any document element that your
-program is not interested in directly untouched in the parse tree, and
-if you have data that could be useful to other packages, decorate the
-parse tree with that data even if you don't see any direct way to use
-it in the output.
-
-In this way, when you want one more feature for POD, rather than write
-or fork a whole translator, a single inline "decorator" can be added.
+Rather than write or fork a whole translator, a single inline
+"decorator" can be added.
 
 The C<paf> utility provides a good starting point, which also allows
-you to hook in to an existing filter/transform library. Simply add a
+you to hook in to an existing filter/transform library. Add a
 C<Pod::Abstract::Filter> class to the namespace and it should start
 working as a C<paf> command.
 
@@ -115,21 +97,19 @@ into:
 
  =back
 
-This transformation can be simply performed on the document tree. If
-your formatter does not use Pod::Abstract, you can simply pipe out POD
-and use a regular formatter. If your formatter supports Pod::Abstract
-though, then you can feed in the syntax tree directly without having
-to re-serialise and parse the document.
+This transformation can be performed on the document tree. If your
+formatter does not use Pod::Abstract, you can pipe out POD and use a
+regular formatter. If your formatter supports Pod::Abstract, you can
+feed in the syntax tree without having to re-serialise and parse the
+document.
 
-In addition to this, because the source document is still valid Pod,
-you aren't breaking compatibility with regular perldoc just by making
-Pod::Abstract transformations.
+The source document is still valid Pod, you aren't breaking
+compatibility with regular perldoc just by making Pod::Abstract
+transformations.
 
 =head2 POD SUPPORT
 
-Pod::Abstract aims to support all POD rules defined in perlpodspec
-(even the ones I don't like), except for those directly related to
-formatting output, or which cannot be implemented generically.
+C<Pod::Abstract> supports all POD rules defined in perlpodspec.
 
 =head1 COMPONENTS
 

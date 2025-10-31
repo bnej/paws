@@ -119,35 +119,39 @@ Pod::Abstract is comprised of:
 
 =item *
 
-The parser, which loads a document tree for you.
+The parser, which loads a document tree.
 
-You should access this through C<Pod::Abstract>, not directly
+e.g:
+
+ my $pa = Pod::Abstract->load_filehandle(\*STDIN);
 
 =item *
 
-The document tree, which is the root node you are given by the
-parser. Calling B<pod> on the root node should always give you back
-your original document.
+The document tree, returned from the parser. The root node (C<$pa>
+above) represents the whole document. Calling B<pod> on the root node
+will give you back your original document.
+
+e.g
+
+ my $pod_text = $pa->pod; # $pod_text is reserialized from the tree.
 
 See L<Pod::Abstract::Node>
 
 =item *
 
-L<Pod::Abstract::Path>, the node selection expression language. This
-is generally called by doing
-C<< $node->select(PATH_EXP) >>. Pod::Abstract::Path is the most complex
-and powerful component of this module, and if you're not using it you
-should be. ;)
+L<Pod::Abstract::Path>, a node selection language. Called via C<<
+$node->select(PATH_EXP) >>. Pod paths are a powerful feature allowing
+declarative traversal of a document.
 
-This allows you to ask questions like:
+For example -
 
-"In the first head1 that starts with "A", find me the head2 matching
-'foo' with bold text somewhere in the preceding paragraph or heading"
+"Find all head2 under METHODS"
 
- /head1[@heading=~{^A}](0)/head2[@heading=~{foo}i]<<head2 :paragraph[//:B]
+ /head1[@heading=~{^METHODS$}]/head2
 
-You probably don't need anything that complex, but it's there if you
-do.
+"Find all bold text anywhere"
+
+ //B
 
 =item *
 

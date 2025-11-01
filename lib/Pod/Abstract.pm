@@ -33,12 +33,19 @@ Pod::Abstract - Abstract document tree for Perl POD documents
 
 =head1 DESCRIPTION
 
-POD::Abstract provides a means to load a POD document without direct
+C<Pod::Abstract> provides a means to load a POD document without direct
 reference to it's syntax, and perform manipulations on the abstract
 syntax tree.
 
 This can be used to support additional features for POD, to format
 output, to compile into alternative formats, etc.
+
+POD documents are not a natural tree, but do have a logical nesting
+structure. C<Pod::Abstract> makes this explicit - C<=head*> commands
+create nested sections, =over and =back create nested lists, etc.
+
+The "paf summary" command provides easy visualisation of the created
+tree.
 
 =head2 USAGE
 
@@ -128,8 +135,14 @@ e.g:
 =item *
 
 The document tree, returned from the parser. The root node (C<$pa>
-above) represents the whole document. Calling B<pod> on the root node
+above) represents the whole document. Calling B<< ->pod >> on the root node
 will give you back your original document.
+
+Note the document includes C<#cut> nodes, which are generally the Perl
+code - the parts that aren't POD. These will be included in the output
+of B<< ->pod >> unless you remove them, so you can modify a Perl module
+as a POD document in POD abstract, and it will work the same
+afterwards.
 
 e.g
 
@@ -145,7 +158,7 @@ declarative traversal of a document.
 
 For example -
 
-"Find all head2 under METHODS"
+"Find all head2s under METHODS"
 
  /head1[@heading=~{^METHODS$}]/head2
 
@@ -155,7 +168,16 @@ For example -
 
 =item *
 
-The node builder, L<Pod::Abstract::BuildNode>
+The node builder, L<Pod::Abstract::BuildNode>. This exports methods to
+allow adding content to POD documents.
+
+You can also combine documents - 
+
+ use Pod::Abstract::BuildNode qw(node nodes);
+ # ...
+ my @nodes = nodes->from_pod($pod);
+
+Where C<$pod> is a text with POD formatting.
 
 =back
 
@@ -229,7 +251,7 @@ Ben Lilburne <bnej@mac.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009 Ben Lilburne
+Copyright (C) 2009-2025 Ben Lilburne
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

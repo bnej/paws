@@ -15,9 +15,10 @@ Pod::Abstract::Parser - Internal Parser class of Pod::Abstract.
 =head1 DESCRIPTION
 
 This is a C<Pod::Parser> subclass, used by C<Pod::Abstract> to convert Pod
-text into a Node tree. You do not need to use this class yourself, the
-C<Pod::Abstract> class will do the work of creating the parser and running
-it for you.
+text into a Node tree.
+
+Use this class via the L<Pod::Abstract> class which has "load" methods
+provided.
 
 =head1 METHODS
 
@@ -296,7 +297,7 @@ Ben Lilburne <bnej@mac.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009 Ben Lilburne
+Copyright (C) 2009-2025 Ben Lilburne
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
